@@ -60,18 +60,21 @@ const reportsFunction = async () => {
 	console.log('posting');
 };
 
-webhookLog('Notification', 'Starting up');
+if (process.argv[2]) {
+	webhookLog(process.argv[2], process.argv[3]);
+} else {
+	p;
+	try {
+		reportsFunction();
+		setInterval(() => reportsFunction(), 60000);
+	} catch {
+		webhookLog('Reports', 'The reports part has failed');
+	}
 
-try {
-	reportsFunction();
-	setInterval(() => reportsFunction(), 60000);
-} catch {
-	webhookLog('Reports', 'The reports part has failed');
-}
-
-try {
-	unbanFunction();
-	setInterval(() => unbanFunction(), 1800000);
-} catch {
-	webhookLog('Unban', 'The unban part has failed');
+	try {
+		unbanFunction();
+		setInterval(() => unbanFunction(), 1800000);
+	} catch {
+		webhookLog('Unban', 'The unban part has failed');
+	}
 }
