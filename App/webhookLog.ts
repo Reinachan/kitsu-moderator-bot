@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const webhookLog = (failed: string) => {
+const webhookLog = (name: string, content: string) => {
 	const logLink = process.env.LOG_LINK;
 
 	const discord = axios({
@@ -10,8 +10,8 @@ const webhookLog = (failed: string) => {
 		},
 		method: 'post',
 		data: {
-			content: 'The ' + failed + ' part has failed',
-			username: failed,
+			content: content,
+			username: name,
 			avatar_url: '',
 		},
 		responseType: 'json',

@@ -60,16 +60,18 @@ const reportsFunction = async () => {
 	console.log('posting');
 };
 
+webhookLog('Notification', 'Starting up');
+
 try {
 	reportsFunction();
 	setInterval(() => reportsFunction(), 60000);
 } catch {
-	webhookLog('Reports');
+	webhookLog('Reports', 'The reports part has failed');
 }
 
 try {
 	unbanFunction();
 	setInterval(() => unbanFunction(), 1800000);
 } catch {
-	webhookLog('Unban');
+	webhookLog('Unban', 'The unban part has failed');
 }
