@@ -1,0 +1,73 @@
+query Reports($first: Int!) {
+	reports(first: $first) {
+		nodes {
+			createdAt
+			id
+			explanation
+			reason
+			status
+			updatedAt
+
+			reporter {
+				...User
+			}
+			moderator {
+				...User
+			}
+
+			naughty {
+				__typename
+				... on Comment {
+					id
+					author {
+						...User
+					}
+					content
+				}
+				... on Post {
+					id
+					author {
+						...User
+					}
+					content
+					postMedia: media {
+						...Media
+					}
+				}
+				... on MediaReaction {
+					id
+					author {
+						...User
+					}
+					reaction
+					media {
+						...Media
+					}
+				}
+			}
+		}
+	}
+}
+
+fragment Media on Media {
+	titles {
+		canonical
+	}
+	posterImage {
+		original {
+			url
+		}
+	}
+}
+
+fragment User on Profile {
+	id
+	name
+	slug
+	url
+	avatarImage {
+		original {
+			url
+		}
+	}
+}

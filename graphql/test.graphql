@@ -1,0 +1,9 @@
+query Test {
+	anime(first: 10) {
+		nodes {
+			titles {
+				canonical
+			}
+		}
+	}
+}

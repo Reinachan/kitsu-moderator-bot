@@ -5,7 +5,8 @@
 	"main": "App/index.ts",
 	"scripts": {
 		"start": "ts-node App/index.ts",
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"gql": "graphql-codegen --config codegen.yml"
 	},
 	"keywords": [
 		"Kitsu"
@@ -13,15 +14,26 @@
 	"author": "Reinachan",
 	"license": "MIT",
 	"devDependencies": {
+		"@graphql-codegen/cli": "1.21.7",
+		"@graphql-codegen/introspection": "1.18.2",
+		"@graphql-codegen/typescript": "1.23.0",
+		"@graphql-codegen/typescript-graphql-request": "^3.2.5",
+		"@graphql-codegen/typescript-operations": "1.18.4",
 		"@types/node": "^16.3.2",
 		"@types/node-fetch": "^2.5.11",
+		"jshint": "^2.13.0",
 		"ts-node": "^10.1.0",
 		"tslib": "^2.3.0",
 		"typescript": "^4.3.5"
 	},
 	"dependencies": {
+		"axios": "^0.21.1",
+		"discord.js": "^12.5.3",
 		"dotenv": "^10.0.0",
 		"googleapis": "^81.0.0",
+		"graphql": "^15.5.1",
+		"graphql-request": "^3.4.0",
+		"hookcord": "^2.0.2",
 		"node-fetch": "^2.6.1"
 	}
 }

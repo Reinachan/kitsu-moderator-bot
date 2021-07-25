@@ -1,0 +1,12 @@
+overwrite: true
+schema: 'https://kitsu.io/api/graphql'
+documents: 'graphql/**/*.graphql'
+generates:
+  App/gen/kitsu.ts:
+    plugins:
+      - typescript
+      - typescript-operations
+      - typescript-graphql-request
+  ./graphql.schema.json:
+    plugins:
+      - introspection

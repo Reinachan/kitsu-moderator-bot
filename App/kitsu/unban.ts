@@ -1,8 +1,12 @@
 import fetch from 'node-fetch';
 import { setServerSideProps } from '../google/setProps';
-import authorize from './auth';
+import notify from './notify';
 
-const unban = async (id: number, uId: string) => {
+const unban = async (data: UnbanData) => {
+	console.log('UNBAN');
+	const id: number = data.id;
+	const uId: string = data.uId;
+
 	const unbanned = await fetch(`https://kitsu.io/api/edge/users/${uId}/_ban`, {
 		method: 'DELETE',
 		headers: {
@@ -16,7 +20,11 @@ const unban = async (id: number, uId: string) => {
 	console.log(res.banned);
 
 	if (res.banned === false) {
-		console.log('banned');
+		console.log('unbanned');
+
+		if (data.notify === 'TRUE') {
+			notify(data);
+		}
 		setServerSideProps(id);
 	}
 };
