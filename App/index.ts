@@ -37,7 +37,6 @@ const unbanFunction = async () => {
 			console.log(list);
 
 			if (checkDate(list.unban, list.time) && list.completed === 'FALSE') {
-				console.log('unbanning');
 				unban(list);
 			}
 
@@ -64,16 +63,20 @@ if (process.argv[2]) {
 	webhookLog(process.argv[2], process.argv[3]);
 } else {
 	try {
-		reportsFunction();
-		setInterval(() => reportsFunction(), 60000);
-	} catch {
-		webhookLog('Reports', 'The reports part has failed');
-	}
+		try {
+			reportsFunction();
+			setInterval(() => reportsFunction(), 60000);
+		} catch {
+			throw 'Failed somewhere within the reports part';
+		}
 
-	try {
-		unbanFunction();
-		setInterval(() => unbanFunction(), 1800000);
-	} catch {
-		webhookLog('Unban', 'The unban part has failed');
+		try {
+			unbanFunction();
+			setInterval(() => unbanFunction(), 1800000);
+		} catch {
+			webhookLog('Crashed', 'Failed somewhere within the unbanning part');
+		}
+	} catch (e) {
+		webhookLog('Crashed', e);
 	}
 }

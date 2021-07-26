@@ -1,5 +1,6 @@
 import fetch from 'node-fetch';
 import { setServerSideProps } from '../google/setProps';
+import webhookLog from '../webhookLog';
 import notify from './notify';
 
 const unban = async (data: UnbanData) => {
@@ -15,17 +16,21 @@ const unban = async (data: UnbanData) => {
 		},
 	});
 
-	const res = JSON.parse(await unbanned.text());
+	try {
+		const res = JSON.parse(await unbanned.text());
+		console.log(res.banned);
 
-	console.log(res.banned);
+		if (res.banned === false) {
+			console.log('unbanned');
+			webhookLog('Unban', `Unbanning ${data.dName}`);
 
-	if (res.banned === false) {
-		console.log('unbanned');
-
-		if (data.notify === 'TRUE') {
-			notify(data);
+			if (data.notify === 'TRUE') {
+				notify(data);
+			}
+			setServerSideProps(id);
 		}
-		setServerSideProps(id);
+	} catch {
+		webhookLog('Partially Down', 'Failed to unban in some way');
 	}
 };
 
