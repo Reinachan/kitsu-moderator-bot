@@ -1,6 +1,8 @@
 import { DiscordAPIError } from 'discord.js';
 import fs from 'fs';
 
+const reportsLocation = './log/reports.json';
+
 const indent = (ob: object) => {
 	return JSON.stringify(ob, undefined, 2);
 };
@@ -10,15 +12,15 @@ const createReportsFile = () => {
 		reports: [{ id: '0', discordId: '0', status: 'SOLVED' }],
 	};
 
-	fs.writeFileSync('./reports.json', indent(template));
+	fs.writeFileSync(reportsLocation, indent(template));
 };
 
 const reportsFile = () => {
 	try {
-		return fs.readFileSync('./reports.json', 'utf8');
+		return fs.readFileSync(reportsLocation, 'utf8');
 	} catch {
 		createReportsFile();
-		return fs.readFileSync('./reports.json', 'utf8');
+		return fs.readFileSync(reportsLocation, 'utf8');
 	}
 };
 
@@ -51,7 +53,7 @@ export const simpleUpdateReportStore = (data: SavedReport) => {
 		} else write.reports.push(report);
 	});
 
-	fs.writeFileSync('./reports.json', indent(write));
+	fs.writeFileSync(reportsLocation, indent(write));
 };
 
 const simpleReportsStore = (data: SavedReport) => {
@@ -60,7 +62,7 @@ const simpleReportsStore = (data: SavedReport) => {
 	reports.reports.push(data);
 	const writeData = reports;
 
-	fs.writeFileSync('./reports.json', indent(writeData));
+	fs.writeFileSync(reportsLocation, indent(writeData));
 };
 
 export default simpleReportsStore;
