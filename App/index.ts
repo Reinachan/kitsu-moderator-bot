@@ -63,7 +63,6 @@ const reportsFunction = async () => {
 if (process.argv[2]) {
 	webhookLog(process.argv[2], process.argv[3]);
 } else {
-	p;
 	try {
 		reportsFunction();
 		setInterval(() => reportsFunction(), 60000);
