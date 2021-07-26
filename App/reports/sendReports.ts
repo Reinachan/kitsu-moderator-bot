@@ -77,11 +77,7 @@ const sendReport = async (report: Report, update?: SavedReport) => {
 		  '||'
 		: naughty?.content;
 
-	const links = `[${report.naughty.author.name}](https://kitsu.io/users/${
-		report.naughty.author.id
-	})\n[${report.reason.toLowerCase()}](https://kitsu.io/${naughty?.reason}/${
-		naughty?.id
-	})\n[Open Reports](https://kitsu.io/admin/reports/open)`;
+	const links = `[${report.naughty.author.name}](https://kitsu.io/users/${report.naughty.author.id})\n[${report.naughty.__typename}](https://kitsu.io/${naughty?.reason}/${naughty?.id})\n[Open Reports](https://kitsu.io/admin/reports/open)`;
 
 	const fields: Discord.EmbedFieldData[] = [
 		{ name: 'Reason', value: report.reason.toLowerCase(), inline: true },
@@ -130,7 +126,6 @@ const sendReport = async (report: Report, update?: SavedReport) => {
 		});
 
 		const response = await discord;
-		console.log(response);
 
 		console.log('update');
 		console.log(
