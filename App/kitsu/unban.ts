@@ -22,12 +22,12 @@ const unban = async (data: UnbanData) => {
 
 		if (res.banned === false) {
 			console.log('unbanned');
-			webhookLog('Unban', `Unbanning ${data.dName}`);
 
 			if (data.notify === 'TRUE') {
 				notify(data);
 			}
 			setServerSideProps(id);
+			webhookLog('Unban', `Unbanning ${data.dName}`, process.env.UNBAN_LINK);
 		}
 	} catch {
 		webhookLog('Partially Down', 'Failed to unban in some way');

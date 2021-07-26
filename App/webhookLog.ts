@@ -1,12 +1,12 @@
 import axios from 'axios';
 
-const webhookLog = (name: string, content: string) => {
+const webhookLog = (name: string, content: string, channel?: string) => {
 	const logLink = process.env.LOG_LINK;
 
 	console.log(name, content);
 
 	const discord = axios({
-		url: logLink,
+		url: channel ?? logLink,
 		headers: {
 			wait: 'false',
 		},
