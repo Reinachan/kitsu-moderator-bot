@@ -92,13 +92,19 @@ const sendReport = async (report: Report, update?: SavedReport) => {
 
 	console.log(modPfp);
 
+	const truncatedDescription = () => {
+		if (description && description.length > 3000) {
+			return description.slice(0, 3000);
+		}
+	};
+
 	const embed = {
 		author: {
 			name: report.naughty.author.name,
 			icon_url: avatar(report.naughty.author.avatarImage?.original.url),
 			url: 'https://kitsu.io/users/' + report.naughty.author.id,
 		},
-		description: description,
+		description: truncatedDescription(),
 		footer: {
 			text: report.moderator?.name + ' • ' + report.status,
 			icon_url: modPfp,
