@@ -14,7 +14,9 @@ const sendSlowly = (array: Report[], speed: number) => {
 		} else if (existing.status !== array[0].status) {
 			sendReport(array[0], existing);
 			sendSlowly(array.slice(1), 2000);
-		} else sendSlowly(array.slice(1), 1);
+		} else {
+			sendSlowly(array.slice(1), 2000);
+		}
 	}, speed);
 };
 
