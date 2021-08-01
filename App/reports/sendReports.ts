@@ -96,6 +96,7 @@ const sendReport = async (report: Report, update?: SavedReport) => {
 		if (description && description.length > 3000) {
 			return description.slice(0, 3000);
 		}
+		return description;
 	};
 
 	const embed = {
