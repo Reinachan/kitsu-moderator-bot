@@ -9,7 +9,7 @@ import { ApolloQueryResult, gql } from '@apollo/client/core';
 
 const fetchReports = async () => {
 	const variables = {
-		first: 15,
+		first: 20,
 	};
 
 	const get = await client();

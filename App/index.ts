@@ -108,7 +108,7 @@ if (process.argv[2]) {
 		}
 
 		try {
-			// unbanFunction();
+			unbanFunction();
 			setInterval(() => unbanFunction(), 1800000);
 		} catch {
 			webhookLog('Crashed', 'Failed somewhere within the unbanning part');
