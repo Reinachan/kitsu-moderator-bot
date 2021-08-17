@@ -8,6 +8,7 @@ import { Report } from './gen/kitsu';
 import sendSlowly from './util/doSlowly';
 import webhookLog from './webhookLog';
 import { rawListeners } from 'process';
+import { checkExists } from './util/ReportsStorage';
 
 require('dotenv').config();
 
@@ -46,17 +47,53 @@ const unbanFunction = async () => {
 };
 
 const reportsFunction = async () => {
-	const reports = await fetchReports();
+	const { data, error, partial } = await fetchReports();
 
-	let rReports = reports?.nodes?.reverse();
+	// console.log(data, error, partial);
 
-	sendSlowly(rReports as Report[], 2000);
+	if (error && partial) {
+		webhookLog('Reports Partial Error', error.message);
+	}
 
-	/* rReports?.forEach((report) => {
+	if (error && !partial) {
+		throw error.message;
+	}
+
+	// console.log(data?.reports?.nodes);
+	const nodes = data.reports?.nodes as Report[];
+
+	let reports = [...nodes];
+
+	console.log(reports);
+
+	if (reports) {
+		reports = reports.reverse();
+
+		// sendSlowly(rReports as Report[], 2000);
+
+		for (let i = 0; i < reports.length; i++) {
+			const timeout = 1000 + i * 2000;
+
+			if (reports[i]) {
+				const existing = checkExists(reports[i].id);
+
+				setTimeout(function () {
+					if (!existing) {
+						sendReport(reports[i]);
+					} else if (existing.status !== reports[i].status) {
+						sendReport(reports[i], existing);
+					}
+				}, timeout);
+			}
+		}
+		console.log('After loop');
+
+		/* rReports?.forEach((report) => {
 		sendReport(report as Report);
 	}); */
 
-	console.log('posting');
+		console.log('posting');
+	}
 };
 
 if (process.argv[2]) {
@@ -71,7 +108,7 @@ if (process.argv[2]) {
 		}
 
 		try {
-			unbanFunction();
+			// unbanFunction();
 			setInterval(() => unbanFunction(), 1800000);
 		} catch {
 			webhookLog('Crashed', 'Failed somewhere within the unbanning part');

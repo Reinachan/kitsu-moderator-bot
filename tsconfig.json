@@ -15,13 +15,27 @@
 			// but *only* in ts-node.  Useful if you want ts-node and tsc to use
 			// different options with a single tsconfig.json.
 			"module": "CommonJS",
-			"moduleResolution": "node"
+			"moduleResolution": "node",
+
+			"allowJs": false,
+			"baseUrl": "./App",
+			"paths": {
+				"App": ["./App"]
+			},
+			"allowSyntheticDefaultImports": true,
+			"pretty": true
 		}
 	},
 	"compilerOptions": {
 		// typescript options here
 		"module": "ESNext",
 		"allowJs": false,
-		"moduleResolution": "node"
+		"moduleResolution": "node",
+		"baseUrl": "./App",
+		"paths": {
+			"App": ["./App"]
+		},
+		"allowSyntheticDefaultImports": true,
+		"pretty": true
 	}
 }

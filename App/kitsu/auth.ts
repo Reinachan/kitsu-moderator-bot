@@ -94,6 +94,12 @@ const authorize = async () => {
 	} else {
 		console.log('add login to .env');
 	}
+
+	const bearer: Promise<string | undefined> = new Promise((resolve, reject) => {
+		setTimeout(() => resolve(process.env.KITSU_BEARER), 3000);
+	});
+
+	return await bearer;
 };
 
 export default authorize;

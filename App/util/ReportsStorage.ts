@@ -1,7 +1,7 @@
 import { DiscordAPIError } from 'discord.js';
 import fs from 'fs';
 
-const reportsLocation = './log/reports.json';
+const reportsLocation = 'log/reports.json';
 
 const indent = (ob: object) => {
 	return JSON.stringify(ob, undefined, 2);
