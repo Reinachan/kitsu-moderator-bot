@@ -23,5 +23,5 @@ export const setServerSideProps = async (id: number) => {
 		requestBody: body,
 	});
 
-	console.log(response);
+	console.log('edited');
 };

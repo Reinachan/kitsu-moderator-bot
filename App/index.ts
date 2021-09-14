@@ -18,9 +18,9 @@ const unbanFunction = async () => {
 	let i = 2;
 	let cont = true;
 
-	while (cont) {
-		await authorize();
+	await authorize();
 
+	while (cont) {
 		const list: UnbanData = await getServerSideProps(i);
 
 		if (
