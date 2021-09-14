@@ -23,6 +23,9 @@ query Reports($first: Int!) {
 						...User
 					}
 					content
+					post {
+						id
+					}
 				}
 				... on Post {
 					id

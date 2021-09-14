@@ -33,6 +33,8 @@ export type Account = WithTimestamps & {
   createdAt: Scalars['ISO8601DateTime'];
   /** The email addresses associated with this account */
   email: Array<Scalars['String']>;
+  /** The features this user has access to */
+  enabledFeatures: Array<Scalars['String']>;
   /** Facebook account linked to the account */
   facebookId?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
@@ -132,6 +134,8 @@ export type Anime = Media & Episodic & WithTimestamps & {
   id: Scalars['ID'];
   /** A list of mappings for this media */
   mappings: MappingConnection;
+  /** Your library entry related to this media. */
+  myLibraryEntry?: Maybe<LibraryEntry>;
   /** A list of your wiki submissions for this media */
   myWikiSubmissions: WikiSubmissionConnection;
   /** The time of the next release of this media */
@@ -191,6 +195,7 @@ export type AnimeCharactersArgs = {
   before?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
   last?: Maybe<Scalars['Int']>;
+  sort?: Maybe<Array<Maybe<MediaCharacterSortOption>>>;
 };
 
 
@@ -246,6 +251,7 @@ export type AnimeReactionsArgs = {
   before?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
   last?: Maybe<Scalars['Int']>;
+  sort?: Maybe<Array<Maybe<MediaReactionSortOption>>>;
 };
 
 
@@ -1525,6 +1531,8 @@ export type Manga = Media & WithTimestamps & {
   id: Scalars['ID'];
   /** A list of mappings for this media */
   mappings: MappingConnection;
+  /** Your library entry related to this media. */
+  myLibraryEntry?: Maybe<LibraryEntry>;
   /** A list of your wiki submissions for this media */
   myWikiSubmissions: WikiSubmissionConnection;
   /** The time of the next release of this media */
@@ -1586,6 +1594,7 @@ export type MangaCharactersArgs = {
   before?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
   last?: Maybe<Scalars['Int']>;
+  sort?: Maybe<Array<Maybe<MediaCharacterSortOption>>>;
 };
 
 
@@ -1632,6 +1641,7 @@ export type MangaReactionsArgs = {
   before?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
   last?: Maybe<Scalars['Int']>;
+  sort?: Maybe<Array<Maybe<MediaReactionSortOption>>>;
 };
 
 
@@ -1861,6 +1871,8 @@ export type Media = {
   id: Scalars['ID'];
   /** A list of mappings for this media */
   mappings: MappingConnection;
+  /** Your library entry related to this media. */
+  myLibraryEntry?: Maybe<LibraryEntry>;
   /** A list of your wiki submissions for this media */
   myWikiSubmissions: WikiSubmissionConnection;
   /** The time of the next release of this media */
@@ -1911,6 +1923,7 @@ export type MediaCharactersArgs = {
   before?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
   last?: Maybe<Scalars['Int']>;
+  sort?: Maybe<Array<Maybe<MediaCharacterSortOption>>>;
 };
 
 
@@ -1963,6 +1976,7 @@ export type MediaReactionsArgs = {
   before?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
   last?: Maybe<Scalars['Int']>;
+  sort?: Maybe<Array<Maybe<MediaReactionSortOption>>>;
 };
 
 
@@ -2020,6 +2034,17 @@ export type MediaCharacterEdge = {
   cursor: Scalars['String'];
   /** The item at the end of the edge. */
   node?: Maybe<MediaCharacter>;
+};
+
+export enum MediaCharacterSortEnum {
+  CreatedAt = 'CREATED_AT',
+  UpdatedAt = 'UPDATED_AT',
+  Role = 'ROLE'
+}
+
+export type MediaCharacterSortOption = {
+  on: MediaCharacterSortEnum;
+  direction: SortDirection;
 };
 
 /** The connection type for Media. */
@@ -2134,6 +2159,17 @@ export type MediaReactionEdge = {
   cursor: Scalars['String'];
   /** The item at the end of the edge. */
   node?: Maybe<MediaReaction>;
+};
+
+export enum MediaReactionSortEnum {
+  CreatedAt = 'CREATED_AT',
+  UpdatedAt = 'UPDATED_AT',
+  UpVotesCount = 'UP_VOTES_COUNT'
+}
+
+export type MediaReactionSortOption = {
+  on: MediaReactionSortEnum;
+  direction: SortDirection;
 };
 
 /** Information about a person working on an anime */
@@ -2582,6 +2618,7 @@ export type ProfileMediaReactionsArgs = {
   before?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
   last?: Maybe<Scalars['Int']>;
+  sort?: Maybe<Array<Maybe<MediaReactionSortOption>>>;
 };
 
 
@@ -3661,6 +3698,9 @@ export type ReportsQuery = (
         & { author: (
           { __typename?: 'Profile' }
           & UserFragment
+        ), post: (
+          { __typename?: 'Post' }
+          & Pick<Post, 'id'>
         ) }
       ) | (
         { __typename: 'MediaReaction' }
@@ -3801,6 +3841,9 @@ export const ReportsDocument = gql`
             ...User
           }
           content
+          post {
+            id
+          }
         }
         ... on Post {
           id

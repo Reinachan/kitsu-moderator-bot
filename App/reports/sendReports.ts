@@ -10,6 +10,7 @@ interface NaughtyContent {
 	reason: string;
 	content: string;
 	media?: string | null;
+	source?: string;
 }
 
 const naughtyContent = (
@@ -19,13 +20,18 @@ const naughtyContent = (
 		return {
 			id: naughty.id,
 			reason: 'posts',
-			content: naughty.content,
+			content: naughty.content ?? 'Image',
 			// @ts-ignore
 			media: naughty.postMedia?.titles?.canonical,
 		};
 	}
 	if (naughty.__typename === 'Comment') {
-		return { id: naughty.id, reason: 'comments', content: naughty.content };
+		return {
+			id: naughty.id,
+			reason: 'comments',
+			content: naughty.content ?? 'Image',
+			source: naughty.post.id,
+		};
 	}
 	if (naughty.__typename === 'MediaReaction') {
 		return {
@@ -45,11 +51,22 @@ const naughtyContent = (
 	}
 };
 
+const mkdLink = (displayed: string, link: string) => {
+	return `[${displayed}](${link})`;
+};
+
 const isSpoiler = (report: Report) => {
 	if (report.reason === 'SPOILER') {
 		return true;
 	}
 	return false;
+};
+
+const truncate = (description: string) => {
+	if (description && description.length > 2500) {
+		return description.slice(0, 2500);
+	}
+	return description;
 };
 
 const sendReport = async (report: Report, update?: SavedReport) => {
@@ -73,11 +90,21 @@ const sendReport = async (report: Report, update?: SavedReport) => {
 		? 'Potential spoiler for ' +
 		  naughty?.media +
 		  '\n\n||' +
-		  naughty?.content +
+		  truncate(naughty?.content ?? '') +
 		  '||'
 		: naughty?.content;
 
-	const links = `[${report.naughty.author.name}](https://kitsu.io/users/${report.naughty.author.id})\n[${report.naughty.__typename}](https://kitsu.io/${naughty?.reason}/${naughty?.id})\n[Open Reports](https://kitsu.io/admin/reports/open)`;
+	const contentLink = () => {
+		if (report.naughty.__typename === 'Comment') {
+			return `[${report.naughty.__typename}](https://kitsu.io/${naughty?.reason}/${naughty?.id}) ⟶ [Post](https://kitsu.io/posts/${naughty?.source})\n`;
+		}
+		return `[${report.naughty.__typename}](https://kitsu.io/${naughty?.reason}/${naughty?.id})\n`;
+	};
+
+	const links =
+		`[${report.naughty.author.name}](https://kitsu.io/users/${report.naughty.author.id})\n` +
+		contentLink() +
+		`[Open Reports](https://kitsu.io/admin/reports/open)`;
 
 	const fields: Discord.EmbedFieldData[] = [
 		{ name: 'Reason', value: report.reason.toLowerCase(), inline: true },
@@ -92,20 +119,13 @@ const sendReport = async (report: Report, update?: SavedReport) => {
 
 	console.log(modPfp);
 
-	const truncatedDescription = () => {
-		if (description && description.length > 3000) {
-			return description.slice(0, 3000);
-		}
-		return description;
-	};
-
 	const embed = {
 		author: {
 			name: report.naughty.author.name,
 			icon_url: avatar(report.naughty.author.avatarImage?.original.url),
 			url: 'https://kitsu.io/users/' + report.naughty.author.id,
 		},
-		description: truncatedDescription(),
+		description: description,
 		footer: {
 			text: report.moderator?.name + ' • ' + report.status,
 			icon_url: modPfp,
