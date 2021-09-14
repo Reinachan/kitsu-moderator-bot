@@ -73,11 +73,11 @@ const isExpired = async (expires: number) => {
 	if (Date.now() <= expires) {
 		return false;
 	}
-	const refreshed = await refreshToken();
+	const refreshed: AuthRes = await refreshToken();
 
 	setAuth(refreshed);
 
-	return true;
+	return refreshed;
 };
 
 const authorize = async () => {
@@ -85,21 +85,21 @@ const authorize = async () => {
 	const psswrd = process.env.KITSU_PASSWORD;
 	const expires = process.env.KITSU_EXPIRES;
 
-	if (uname && psswrd && !expires) {
-		const auth = getAuth(uname, psswrd);
+	const bearer = async () => {
+		if (uname && psswrd && !expires) {
+			const auth: AuthRes = await getAuth(uname, psswrd);
 
-		setAuth(await auth);
-	} else if (expires) {
-		isExpired(parseInt(expires));
-	} else {
-		console.log('add login to .env');
-	}
+			setAuth(auth);
 
-	const bearer: Promise<string | undefined> = new Promise((resolve, reject) => {
-		setTimeout(() => resolve(process.env.KITSU_BEARER), 3000);
-	});
+			return auth.access_token;
+		} else if (expires) {
+			return await isExpired(parseInt(expires));
+		} else {
+			console.log('add login to .env');
+		}
+	};
 
-	return await bearer;
+	return await bearer();
 };
 
 export default authorize;
