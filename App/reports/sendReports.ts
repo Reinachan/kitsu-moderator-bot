@@ -117,8 +117,6 @@ const sendReport = async (report: Report, update?: SavedReport) => {
 			report.moderator?.avatarImage?.original.url.replace(/\?[0-9]+$/, '')
 		) ?? undefined;
 
-	console.log(modPfp);
-
 	const embed = {
 		author: {
 			name: report.naughty.author.name,
@@ -154,14 +152,6 @@ const sendReport = async (report: Report, update?: SavedReport) => {
 
 		const response = await discord;
 
-		console.log('update');
-		console.log(
-			report.status,
-			report.reason,
-			report.naughty.__typename,
-			report.id
-		);
-
 		simpleUpdateReportStore({
 			id: report.id,
 			discordId: update.discordId,
@@ -175,8 +165,6 @@ const sendReport = async (report: Report, update?: SavedReport) => {
 		});
 
 		const response = await discord;
-
-		console.log('send new');
 
 		simpleReportsStore({
 			id: report.id,

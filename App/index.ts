@@ -12,7 +12,7 @@ import { checkExists } from './util/ReportsStorage';
 
 require('dotenv').config();
 
-console.log('before');
+console.log('Start');
 
 const unbanFunction = async () => {
 	let i = 2;
@@ -49,8 +49,6 @@ const unbanFunction = async () => {
 const reportsFunction = async () => {
 	const { data, error, partial } = await fetchReports();
 
-	// console.log(data, error, partial);
-
 	if (error && partial) {
 		webhookLog('Reports Partial Error', error.message);
 	}
@@ -59,12 +57,9 @@ const reportsFunction = async () => {
 		throw error.message;
 	}
 
-	// console.log(data?.reports?.nodes);
 	const nodes = data.reports?.nodes as Report[];
 
 	let reports = [...nodes];
-
-	console.log(reports);
 
 	if (reports) {
 		reports = reports.reverse();
