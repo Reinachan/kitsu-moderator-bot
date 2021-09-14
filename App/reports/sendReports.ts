@@ -30,7 +30,7 @@ const naughtyContent = (
 			id: naughty.id,
 			reason: 'comments',
 			content: naughty.content ?? 'Image',
-			source: naughty.post.id,
+			source: naughty?.post?.id,
 		};
 	}
 	if (naughty.__typename === 'MediaReaction') {
