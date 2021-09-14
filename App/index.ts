@@ -62,8 +62,6 @@ const reportsFunction = async () => {
 	if (reports) {
 		reports = reports.reverse();
 
-		// sendSlowly(rReports as Report[], 2000);
-
 		for (let i = 0; i < reports.length; i++) {
 			const timeout = 1000 + i * 2000;
 
@@ -79,13 +77,6 @@ const reportsFunction = async () => {
 				}, timeout);
 			}
 		}
-		console.log('After loop');
-
-		/* rReports?.forEach((report) => {
-		sendReport(report as Report);
-	}); */
-
-		console.log('posting');
 	}
 };
 
