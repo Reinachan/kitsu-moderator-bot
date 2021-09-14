@@ -5,9 +5,7 @@ import authorize from './kitsu/auth';
 import fetchReports from './reports/fetchReports';
 import sendReport from './reports/sendReports';
 import { Report } from './gen/kitsu';
-import sendSlowly from './util/doSlowly';
 import webhookLog from './webhookLog';
-import { rawListeners } from 'process';
 import { checkExists } from './util/ReportsStorage';
 
 require('dotenv').config();
