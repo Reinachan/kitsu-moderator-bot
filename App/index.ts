@@ -16,8 +16,6 @@ const unbanFunction = async () => {
 	let i = 2;
 	let cont = true;
 
-	await authorize();
-
 	while (cont) {
 		const list: UnbanData = await getServerSideProps(i);
 
@@ -98,6 +96,6 @@ if (process.argv[2]) {
 			webhookLog('Crashed', 'Failed somewhere within the unbanning part');
 		}
 	} catch (e) {
-		webhookLog('Crashed', e);
+		webhookLog('Crashed', 'Total collapse');
 	}
 }
