@@ -134,6 +134,10 @@ const sendReport = async (report: Report, update?: SavedReport) => {
 		color: 15097922,
 	};
 
+	const messageContent =
+		`[Reporter's profile](https://kitsu.io/users/${report.reporter.id})\n` +
+		`${report.explanation ?? ''}`;
+
 	if (update) {
 		const discord = axios({
 			url: process.env.REPORTS_WEBHOOK + '/messages/' + update?.discordId,
@@ -142,7 +146,7 @@ const sendReport = async (report: Report, update?: SavedReport) => {
 			},
 			method: 'patch',
 			data: {
-				content: report.explanation ?? '',
+				content: messageContent,
 				username: report.reporter.name,
 				avatar_url: avatar(report.reporter.avatarImage?.original.url),
 				embeds: [embed],
@@ -158,7 +162,7 @@ const sendReport = async (report: Report, update?: SavedReport) => {
 			status: report.status,
 		});
 	} else {
-		const discord = webhookClient.send(report.explanation, {
+		const discord = webhookClient.send(messageContent, {
 			username: report.reporter.name,
 			avatarURL: avatar(report.reporter.avatarImage?.original.url),
 			embeds: [embed],
