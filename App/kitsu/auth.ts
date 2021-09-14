@@ -57,7 +57,7 @@ const getAuth = async (uname: string, psswrd: string) => {
 };
 
 const refreshToken = async () => {
-	const refresh = process.env.REFRESH_TOKEN;
+	const refresh = process.env.KITSU_REFRESH;
 
 	const body = {
 		grant_type: 'refresh_token',
