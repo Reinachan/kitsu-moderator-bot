@@ -71,7 +71,7 @@ const refreshToken = async () => {
 
 const isExpired = async (expires: number) => {
 	if (Date.now() <= expires) {
-		return false;
+		return process.env.KITSU_BEARER;
 	}
 	const refreshed: AuthRes = await refreshToken();
 
