@@ -92,7 +92,7 @@ const sendReport = async (report: Report, update?: SavedReport) => {
 		  '\n\n||' +
 		  truncate(naughty?.content ?? '') +
 		  '||'
-		: naughty?.content;
+		: truncate(naughty?.content ?? '');
 
 	const contentLink = () => {
 		if (report.naughty.__typename === 'Comment') {
