@@ -1,4 +1,9 @@
-import Discord from 'discord.js';
+import Discord, {
+	MessageActionRow,
+	MessageActionRowOptions,
+	MessageButton,
+	MessageButtonOptions,
+} from 'discord.js';
 import { Report, ReportItemUnion } from '../gen/kitsu';
 import simpleReportsStore, {
 	simpleUpdateReportStore,
@@ -69,11 +74,23 @@ const truncate = (description: string) => {
 	return description;
 };
 
+const linkButton = (label: string, url: string): MessageButtonOptions => {
+	return {
+		type: 2,
+		label: label,
+		url: url,
+		style: 5,
+	};
+};
+
 const sendReport = async (report: Report, update?: SavedReport) => {
-	const webhookClient = new Discord.WebhookClient(
-		process.env.REPORTS_WEBHOOK_ID ?? '',
-		process.env.REPORTS_WEBHOOK_TOKEN ?? ''
-	);
+	const reportsId = process.env.REPORTS_ID || '';
+	const reportsToken = process.env.REPORTS_TOKEN || '';
+
+	const webhookClient = new Discord.WebhookClient({
+		id: reportsId,
+		token: reportsToken,
+	});
 
 	const avatar = (link: string | undefined) => {
 		if (link === '/avatars/original/missing.png' || link === undefined) {
@@ -94,11 +111,16 @@ const sendReport = async (report: Report, update?: SavedReport) => {
 		  '||'
 		: naughty?.content;
 
-	const contentLink = () => {
-		if (report.naughty.__typename === 'Comment') {
-			return `[${report.naughty.__typename}](https://kitsu.io/${naughty?.reason}/${naughty?.id}) ⟶ [Post](https://kitsu.io/posts/${naughty?.source})\n`;
-		}
-		return `[${report.naughty.__typename}](https://kitsu.io/${naughty?.reason}/${naughty?.id})\n`;
+	const contentLink = (): MessageButtonOptions[] => {
+		return [
+			linkButton(
+				report?.naughty?.__typename!,
+				`https://kitsu.io/${naughty?.reason}/${naughty?.id}`
+			),
+			report.naughty.__typename === 'Comment'
+				? linkButton('⟶ Post', `https://kitsu.io/posts/${naughty?.source}`)
+				: (undefined as unknown as MessageButtonOptions),
+		];
 	};
 
 	const links =
@@ -108,7 +130,36 @@ const sendReport = async (report: Report, update?: SavedReport) => {
 
 	const fields: Discord.EmbedFieldData[] = [
 		{ name: 'Reason', value: report.reason.toLowerCase(), inline: true },
-		{ name: 'Links', value: links, inline: true },
+		{ name: 'User ID', value: report.naughty.author.id, inline: true },
+	];
+
+	const linkSource = () => {
+		if (report.naughty.__typename === 'Comment')
+			return [
+				linkButton(
+					report?.naughty?.__typename!,
+					`https://kitsu.io/${naughty?.reason}/${naughty?.id}`
+				),
+				linkButton('on Post', `https://kitsu.io/posts/${naughty?.source}`),
+			];
+		return [
+			linkButton(
+				report?.naughty?.__typename!,
+				`https://kitsu.io/${naughty?.reason}/${naughty?.id}`
+			),
+		];
+	};
+
+	const openReports = [
+		linkButton('Open Reports', 'https://kitsu.io/admin/reports/open'),
+	];
+
+	const userRow: MessageButtonOptions[] = [
+		linkButton('Reporter', `https://kitsu.io/users/${report.reporter.id}`),
+		linkButton(
+			report.naughty.author.name,
+			`https://kitsu.io/users/${report.naughty.author.id}`
+		),
 	];
 
 	// Remove the numbers at the end of the pfp which is causing issues
@@ -134,13 +185,20 @@ const sendReport = async (report: Report, update?: SavedReport) => {
 		color: 15097922,
 	};
 
-	const messageContent =
-		`[Reporter's profile](https://kitsu.io/users/${report.reporter.id})\n` +
-		`${report.explanation ?? ''}`;
+	const messageContent = report.explanation ?? 'No message';
+
+	const componentRow = (
+		buttons: MessageButtonOptions[]
+	): MessageActionRowOptions => {
+		return {
+			type: 1,
+			components: buttons,
+		};
+	};
 
 	if (update) {
 		const discord = axios({
-			url: process.env.REPORTS_WEBHOOK + '/messages/' + update?.discordId,
+			url: `https://discord.com/api/webhooks/${reportsId}/${reportsToken}/messages/${update?.discordId}`,
 			headers: {
 				wait: 'false',
 			},
@@ -150,6 +208,11 @@ const sendReport = async (report: Report, update?: SavedReport) => {
 				username: report.reporter.name,
 				avatar_url: avatar(report.reporter.avatarImage?.original.url),
 				embeds: [embed],
+				components: [
+					componentRow(userRow),
+					componentRow(linkSource()),
+					componentRow(openReports),
+				],
 			},
 			responseType: 'json',
 		});
@@ -162,10 +225,16 @@ const sendReport = async (report: Report, update?: SavedReport) => {
 			status: report.status,
 		});
 	} else {
-		const discord = webhookClient.send(messageContent, {
+		const discord = webhookClient.send({
+			content: messageContent,
 			username: report.reporter.name,
 			avatarURL: avatar(report.reporter.avatarImage?.original.url),
 			embeds: [embed],
+			components: [
+				componentRow(userRow),
+				componentRow(linkSource()),
+				componentRow(openReports),
+			],
 		});
 
 		const response = await discord;

@@ -6,7 +6,8 @@
 	"scripts": {
 		"start": "ts-node App/index.ts",
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"gql": "graphql-codegen --config codegen.yml"
+		"gql": "graphql-codegen --config codegen.yml",
+		"reg-commands": "ts-node App/registerCommands.ts"
 	},
 	"keywords": [
 		"Kitsu"
@@ -15,6 +16,8 @@
 	"license": "MIT",
 	"dependencies": {
 		"@apollo/client": "^3.4.7",
+		"@discordjs/builders": "^0.6.0",
+		"@discordjs/rest": "^0.1.0-canary.0",
 		"@graphql-codegen/cli": "1.21.7",
 		"@graphql-codegen/introspection": "1.18.2",
 		"@graphql-codegen/typescript": "1.23.0",
@@ -24,7 +27,8 @@
 		"@types/node-fetch": "^2.5.11",
 		"axios": "^0.21.1",
 		"cross-fetch": "^3.1.4",
-		"discord.js": "^12.5.3",
+		"discord-api-types": "^0.23.1",
+		"discord.js": "^13.1.0",
 		"dotenv": "^10.0.0",
 		"googleapis": "^81.0.0",
 		"graphql": "^15.5.1",
