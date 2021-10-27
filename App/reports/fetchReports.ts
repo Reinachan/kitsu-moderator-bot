@@ -1,5 +1,5 @@
 import { GraphQLClient } from 'graphql-request';
-import { ReportsDocument } from '../gen/queries'; // THIS FILE IS THE GENERATED FILE
+import { GqlReports, GqlReportsPartial } from '../gen/query'; // THIS FILE IS THE GENERATED FILE
 import { ReportsQuery } from '../gen/kitsu';
 import authorize from '../kitsu/auth';
 import { checkExists } from '../util/ReportsStorage';
@@ -7,20 +7,35 @@ import { checkExists } from '../util/ReportsStorage';
 import client from '../ApolloGraphql';
 import { ApolloQueryResult, gql } from '@apollo/client/core';
 
-const fetchReports = async () => {
+export const enum FetchData {
+	All = 1,
+	Partial = 2,
+}
+
+const fetchReports = async (fetchData: FetchData) => {
 	const variables = {
 		first: 20,
 	};
 
 	const get = await client();
 
-	const res = await get.query<ReportsQuery>({
-		query: ReportsDocument,
-		variables: variables,
-		errorPolicy: 'all',
-	});
+	if (fetchData === FetchData.All) {
+		const res = await get.query<ReportsQuery>({
+			query: GqlReports,
+			variables: variables,
+			errorPolicy: 'all',
+		});
 
-	return res;
+		return res;
+	} else {
+		const res = await get.query<ReportsQuery>({
+			query: GqlReportsPartial,
+			variables: variables,
+			errorPolicy: 'all',
+		});
+
+		return res;
+	}
 };
 
 // const fetchReportsDeprecated = async () => {

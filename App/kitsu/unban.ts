@@ -5,7 +5,7 @@ import webhookLog from '../webhookLog';
 import notify from './notify';
 
 const unbanMessage = (data: UnbanData) => {
-	const logLink = process.env.UNBAN_LINK;
+	const logLink = `https://discord.com/api/webhooks/${process.env.UNBAN_ID}/${process.env.UNBAN_TOKEN}`;
 
 	const boolSign = (bool: string) => {
 		if (bool === 'TRUE') {

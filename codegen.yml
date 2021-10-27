@@ -10,3 +10,8 @@ generates:
   ./graphql.schema.json:
     plugins:
       - introspection
+  App/gen/query.ts:
+    plugins:
+      - typescript-document-nodes
+    config:
+      namePrefix: 'gql'

@@ -1,9 +1,20 @@
-import Discord from 'discord.js';
-import { Report, ReportItemUnion } from '../gen/kitsu';
+import Discord, {
+	Client,
+	Message,
+	MessageActionRow,
+	MessageActionRowOptions,
+	MessageButton,
+	MessageButtonOptions,
+	MessageEmbed,
+	TextChannel,
+} from 'discord.js';
+import { Profile, Report, ReportItemUnion } from '../gen/kitsu';
 import simpleReportsStore, {
 	simpleUpdateReportStore,
 } from '../util/ReportsStorage';
 import axios from 'axios';
+import { UserFragment } from '../gen/kitsu';
+import { client } from '../index';
 
 interface NaughtyContent {
 	id: string;
@@ -69,18 +80,30 @@ const truncate = (description: string) => {
 	return description;
 };
 
-const sendReport = async (report: Report, update?: SavedReport) => {
-	const webhookClient = new Discord.WebhookClient(
-		process.env.REPORTS_WEBHOOK_ID ?? '',
-		process.env.REPORTS_WEBHOOK_TOKEN ?? ''
-	);
-
-	const avatar = (link: string | undefined) => {
-		if (link === '/avatars/original/missing.png' || link === undefined) {
-			return 'https://media.kitsu.io/users/avatars/172892/large.png?1618344125';
-		}
-		return link;
+const linkButton = (label: string, url: string): MessageButtonOptions => {
+	return {
+		type: 2,
+		label: label,
+		url: url,
+		style: 5,
 	};
+};
+
+const avatar = (link: string | undefined) => {
+	if (link === '/avatars/original/missing.png' || link === undefined) {
+		return 'https://media.kitsu.io/users/avatars/172892/large.png?1618344125';
+	}
+	return link;
+};
+
+const sendReport = async (report: Report, update?: SavedReport) => {
+	const reportsId = process.env.REPORTS_ID || '';
+	const reportsToken = process.env.REPORTS_TOKEN || '';
+
+	const webhookClient = new Discord.WebhookClient({
+		id: reportsId,
+		token: reportsToken,
+	});
 
 	const naughty = naughtyContent(report.naughty);
 
@@ -94,11 +117,16 @@ const sendReport = async (report: Report, update?: SavedReport) => {
 		  '||'
 		: truncate(naughty?.content ?? '');
 
-	const contentLink = () => {
-		if (report.naughty.__typename === 'Comment') {
-			return `[${report.naughty.__typename}](https://kitsu.io/${naughty?.reason}/${naughty?.id}) ⟶ [Post](https://kitsu.io/posts/${naughty?.source})\n`;
-		}
-		return `[${report.naughty.__typename}](https://kitsu.io/${naughty?.reason}/${naughty?.id})\n`;
+	const contentLink = (): MessageButtonOptions[] => {
+		return [
+			linkButton(
+				report?.naughty?.__typename!,
+				`https://kitsu.io/${naughty?.reason}/${naughty?.id}`
+			),
+			report.naughty.__typename === 'Comment'
+				? linkButton('⟶ Post', `https://kitsu.io/posts/${naughty?.source}`)
+				: (undefined as unknown as MessageButtonOptions),
+		];
 	};
 
 	const links =
@@ -108,7 +136,36 @@ const sendReport = async (report: Report, update?: SavedReport) => {
 
 	const fields: Discord.EmbedFieldData[] = [
 		{ name: 'Reason', value: report.reason.toLowerCase(), inline: true },
-		{ name: 'Links', value: links, inline: true },
+		{ name: 'User ID', value: report.naughty.author.id, inline: true },
+	];
+
+	const linkSource = () => {
+		if (report.naughty.__typename === 'Comment')
+			return [
+				linkButton(
+					report?.naughty?.__typename!,
+					`https://kitsu.io/${naughty?.reason}/${naughty?.id}`
+				),
+				linkButton('on Post', `https://kitsu.io/posts/${naughty?.source}`),
+			];
+		return [
+			linkButton(
+				report?.naughty?.__typename!,
+				`https://kitsu.io/${naughty?.reason}/${naughty?.id}`
+			),
+		];
+	};
+
+	const openReports = [
+		linkButton('Open Reports', 'https://kitsu.io/admin/reports/open'),
+	];
+
+	const userRow: MessageButtonOptions[] = [
+		linkButton('Reporter', `https://kitsu.io/users/${report.reporter.id}`),
+		linkButton(
+			report.naughty.author.name,
+			`https://kitsu.io/users/${report.naughty.author.id}`
+		),
 	];
 
 	// Remove the numbers at the end of the pfp which is causing issues
@@ -134,13 +191,24 @@ const sendReport = async (report: Report, update?: SavedReport) => {
 		color: 15097922,
 	};
 
-	const messageContent =
-		`[Reporter's profile](https://kitsu.io/users/${report.reporter.id})\n` +
-		`${report.explanation ?? ''}`;
+	const messageContent = report.explanation
+		? report.explanation?.length > 0
+			? report.explanation
+			: 'No explanation'
+		: 'No explanation';
+
+	const componentRow = (
+		buttons: MessageButtonOptions[]
+	): MessageActionRowOptions => {
+		return {
+			type: 1,
+			components: buttons,
+		};
+	};
 
 	if (update) {
 		const discord = axios({
-			url: process.env.REPORTS_WEBHOOK + '/messages/' + update?.discordId,
+			url: `https://discord.com/api/webhooks/${reportsId}/${reportsToken}/messages/${update?.discordId}`,
 			headers: {
 				wait: 'false',
 			},
@@ -150,6 +218,11 @@ const sendReport = async (report: Report, update?: SavedReport) => {
 				username: report.reporter.name,
 				avatar_url: avatar(report.reporter.avatarImage?.original.url),
 				embeds: [embed],
+				components: [
+					componentRow(userRow),
+					componentRow(linkSource()),
+					componentRow(openReports),
+				],
 			},
 			responseType: 'json',
 		});
@@ -162,10 +235,16 @@ const sendReport = async (report: Report, update?: SavedReport) => {
 			status: report.status,
 		});
 	} else {
-		const discord = webhookClient.send(messageContent, {
+		const discord = webhookClient.send({
+			content: messageContent,
 			username: report.reporter.name,
 			avatarURL: avatar(report.reporter.avatarImage?.original.url),
 			embeds: [embed],
+			components: [
+				componentRow(userRow),
+				componentRow(linkSource()),
+				componentRow(openReports),
+			],
 		});
 
 		const response = await discord;
@@ -176,6 +255,58 @@ const sendReport = async (report: Report, update?: SavedReport) => {
 			status: report.status,
 		});
 	}
+};
+
+export const editReport = async (data: SavedReport, moderator: Profile) => {
+	const reportsId = process.env.REPORTS_ID || '';
+	const reportsToken = process.env.REPORTS_TOKEN || '';
+
+	const webhookClient = new Discord.WebhookClient({
+		id: reportsId,
+		token: reportsToken,
+	});
+
+	const guild = client.guilds.cache.find(
+		(guild) => guild.name === process.env.SERVER
+	);
+
+	const channel = guild?.channels.cache.find(
+		(channel) => channel.id === process.env.REPORTS_CHANNEL_ID
+	) as TextChannel;
+
+	console.log(process.env.REPORTS_CHANNEL_ID);
+
+	const messageList = await channel.messages.fetch({ limit: 20 });
+
+	const message = messageList.get(data.discordId);
+
+	console.log(message);
+
+	const recievedEmbed = message?.embeds[0];
+
+	console.log(recievedEmbed);
+
+	const modPfp =
+		avatar(moderator?.avatarImage?.original.url.replace(/\?[0-9]+$/, '')) ??
+		undefined;
+
+	const embed = new MessageEmbed(recievedEmbed).setFooter(
+		`${moderator?.name} • ${data.status}`,
+		modPfp
+	);
+
+	console.log(embed);
+
+	const edited = webhookClient.editMessage(data.discordId, {
+		content: message?.content,
+		embeds: [embed],
+	});
+
+	simpleReportsStore({
+		id: data.id,
+		discordId: data.discordId,
+		status: data.status,
+	});
 };
 
 export default sendReport;

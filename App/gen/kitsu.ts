@@ -187,6 +187,7 @@ export type AnimeCategoriesArgs = {
   before?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
   last?: Maybe<Scalars['Int']>;
+  sort?: Maybe<Array<Maybe<MediaCategorySortOption>>>;
 };
 
 
@@ -209,7 +210,7 @@ export type AnimeEpisodesArgs = {
   before?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
   last?: Maybe<Scalars['Int']>;
-  number?: Maybe<Array<Scalars['Int']>>;
+  sort?: Maybe<Array<Maybe<EpisodeSortOption>>>;
 };
 
 
@@ -424,6 +425,8 @@ export type Category = WithTimestamps & {
   isNsfw: Scalars['Boolean'];
   /** The parent category. Each category can have one parent. */
   parent?: Maybe<Category>;
+  /** The top-level ancestor category */
+  root?: Maybe<Category>;
   /** The URL-friendly identifier of this Category. */
   slug: Scalars['String'];
   /** The name of the category. */
@@ -621,6 +624,16 @@ export type CharacterVoiceEdge = {
   node?: Maybe<CharacterVoice>;
 };
 
+export enum CharacterVoiceSortEnum {
+  CreatedAt = 'CREATED_AT',
+  UpdatedAt = 'UPDATED_AT'
+}
+
+export type CharacterVoiceSortOption = {
+  on: CharacterVoiceSortEnum;
+  direction: SortDirection;
+};
+
 /** A comment on a post */
 export type Comment = WithTimestamps & {
   __typename?: 'Comment';
@@ -807,6 +820,17 @@ export type EpisodeMutationsUpdateArgs = {
   input: EpisodeUpdateInput;
 };
 
+export enum EpisodeSortEnum {
+  CreatedAt = 'CREATED_AT',
+  UpdatedAt = 'UPDATED_AT',
+  Number = 'NUMBER'
+}
+
+export type EpisodeSortOption = {
+  on: EpisodeSortEnum;
+  direction: SortDirection;
+};
+
 export type EpisodeUpdateInput = {
   id: Scalars['ID'];
   titles?: Maybe<TitlesListInput>;
@@ -843,7 +867,7 @@ export type EpisodicEpisodesArgs = {
   before?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
   last?: Maybe<Scalars['Int']>;
-  number?: Maybe<Array<Scalars['Int']>>;
+  sort?: Maybe<Array<Maybe<EpisodeSortOption>>>;
 };
 
 /** Generic error fields used by all errors. */
@@ -1216,7 +1240,6 @@ export type LibraryEntryConnection = {
 };
 
 export type LibraryEntryCreateInput = {
-  userId: Scalars['ID'];
   mediaId: Scalars['ID'];
   mediaType: MediaTypeEnum;
   status: LibraryEntryStatusEnum;
@@ -1578,6 +1601,7 @@ export type MangaCategoriesArgs = {
   before?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
   last?: Maybe<Scalars['Int']>;
+  sort?: Maybe<Array<Maybe<MediaCategorySortOption>>>;
 };
 
 
@@ -1586,6 +1610,7 @@ export type MangaChaptersArgs = {
   before?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
   last?: Maybe<Scalars['Int']>;
+  sort?: Maybe<Array<Maybe<CharacterVoiceSortOption>>>;
 };
 
 
@@ -1914,6 +1939,7 @@ export type MediaCategoriesArgs = {
   before?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
   last?: Maybe<Scalars['Int']>;
+  sort?: Maybe<Array<Maybe<MediaCategorySortOption>>>;
 };
 
 
@@ -1988,6 +2014,16 @@ export type MediaStaffArgs = {
   last?: Maybe<Scalars['Int']>;
 };
 
+export enum MediaCategorySortEnum {
+  Ancestry = 'ANCESTRY',
+  CreatedAt = 'CREATED_AT'
+}
+
+export type MediaCategorySortOption = {
+  on: MediaCategorySortEnum;
+  direction: SortDirection;
+};
+
 /** Information about a Character starring in a Media */
 export type MediaCharacter = WithTimestamps & {
   __typename?: 'MediaCharacter';
@@ -2012,6 +2048,7 @@ export type MediaCharacterVoicesArgs = {
   first?: Maybe<Scalars['Int']>;
   last?: Maybe<Scalars['Int']>;
   locale?: Maybe<Array<Scalars['String']>>;
+  sort?: Maybe<Array<Maybe<CharacterVoiceSortOption>>>;
 };
 
 /** The connection type for MediaCharacter. */
@@ -2119,7 +2156,7 @@ export type MediaReaction = WithTimestamps & {
   id: Scalars['ID'];
   /** The library entry related to this reaction. */
   libraryEntry: LibraryEntry;
-  /** Users who liked this reaction. */
+  /** Users that have liked this reaction */
   likes: ProfileConnection;
   /** The media related to this reaction. */
   media: Media;
@@ -2137,6 +2174,7 @@ export type MediaReactionLikesArgs = {
   before?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
   last?: Maybe<Scalars['Int']>;
+  sort?: Maybe<Array<Maybe<MediaReactionVoteSortOption>>>;
 };
 
 /** The connection type for MediaReaction. */
@@ -2169,6 +2207,16 @@ export enum MediaReactionSortEnum {
 
 export type MediaReactionSortOption = {
   on: MediaReactionSortEnum;
+  direction: SortDirection;
+};
+
+export enum MediaReactionVoteSortEnum {
+  CreatedAt = 'CREATED_AT',
+  Following = 'FOLLOWING'
+}
+
+export type MediaReactionVoteSortOption = {
+  on: MediaReactionVoteSortEnum;
   direction: SortDirection;
 };
 
@@ -3775,6 +3823,26 @@ export type UserFragment = (
   )> }
 );
 
+export type ReportsPartialQueryVariables = Exact<{
+  first: Scalars['Int'];
+}>;
+
+
+export type ReportsPartialQuery = (
+  { __typename?: 'Query' }
+  & { reports?: Maybe<(
+    { __typename?: 'ReportConnection' }
+    & { nodes?: Maybe<Array<Maybe<(
+      { __typename?: 'Report' }
+      & Pick<Report, 'createdAt' | 'id' | 'status'>
+      & { moderator?: Maybe<(
+        { __typename?: 'Profile' }
+        & UserFragment
+      )> }
+    )>>> }
+  )> }
+);
+
 export type TestQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -3871,6 +3939,20 @@ export const ReportsDocument = gql`
 }
     ${UserFragmentDoc}
 ${MediaFragmentDoc}`;
+export const ReportsPartialDocument = gql`
+    query ReportsPartial($first: Int!) {
+  reports(first: $first) {
+    nodes {
+      createdAt
+      id
+      status
+      moderator {
+        ...User
+      }
+    }
+  }
+}
+    ${UserFragmentDoc}`;
 export const TestDocument = gql`
     query Test {
   anime(first: 10) {
@@ -3892,6 +3974,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
   return {
     Reports(variables: ReportsQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ReportsQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<ReportsQuery>(ReportsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'Reports');
+    },
+    ReportsPartial(variables: ReportsPartialQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<ReportsPartialQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<ReportsPartialQuery>(ReportsPartialDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'ReportsPartial');
     },
     Test(variables?: TestQueryVariables, requestHeaders?: Dom.RequestInit["headers"]): Promise<TestQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<TestQuery>(TestDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'Test');

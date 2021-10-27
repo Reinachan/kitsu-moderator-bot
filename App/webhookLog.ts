@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const webhookLog = (name: string, content: string, channel?: string) => {
-	const logLink = process.env.LOG_LINK;
+	const logLink = `https://discord.com/api/webhooks/${process.env.LOGGING_ID}/${process.env.LOGGING_TOKEN}`;
 
 	console.log(name, content);
 
