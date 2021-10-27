@@ -1,3 +1,5 @@
+import { TextChannel } from 'discord.js';
+
 enum SettingName {
 	Reports = 'reports',
 	Logging = 'logging',

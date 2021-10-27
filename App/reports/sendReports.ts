@@ -1,14 +1,20 @@
 import Discord, {
+	Client,
+	Message,
 	MessageActionRow,
 	MessageActionRowOptions,
 	MessageButton,
 	MessageButtonOptions,
+	MessageEmbed,
+	TextChannel,
 } from 'discord.js';
-import { Report, ReportItemUnion } from '../gen/kitsu';
+import { Profile, Report, ReportItemUnion } from '../gen/kitsu';
 import simpleReportsStore, {
 	simpleUpdateReportStore,
 } from '../util/ReportsStorage';
 import axios from 'axios';
+import { UserFragment } from '../gen/kitsu';
+import { client } from '../index';
 
 interface NaughtyContent {
 	id: string;
@@ -83,6 +89,13 @@ const linkButton = (label: string, url: string): MessageButtonOptions => {
 	};
 };
 
+const avatar = (link: string | undefined) => {
+	if (link === '/avatars/original/missing.png' || link === undefined) {
+		return 'https://media.kitsu.io/users/avatars/172892/large.png?1618344125';
+	}
+	return link;
+};
+
 const sendReport = async (report: Report, update?: SavedReport) => {
 	const reportsId = process.env.REPORTS_ID || '';
 	const reportsToken = process.env.REPORTS_TOKEN || '';
@@ -91,13 +104,6 @@ const sendReport = async (report: Report, update?: SavedReport) => {
 		id: reportsId,
 		token: reportsToken,
 	});
-
-	const avatar = (link: string | undefined) => {
-		if (link === '/avatars/original/missing.png' || link === undefined) {
-			return 'https://media.kitsu.io/users/avatars/172892/large.png?1618344125';
-		}
-		return link;
-	};
 
 	const naughty = naughtyContent(report.naughty);
 
@@ -185,7 +191,11 @@ const sendReport = async (report: Report, update?: SavedReport) => {
 		color: 15097922,
 	};
 
-	const messageContent = report.explanation ?? 'No message';
+	const messageContent = report.explanation
+		? report.explanation?.length > 0
+			? report.explanation
+			: 'No explanation'
+		: 'No explanation';
 
 	const componentRow = (
 		buttons: MessageButtonOptions[]
@@ -245,6 +255,58 @@ const sendReport = async (report: Report, update?: SavedReport) => {
 			status: report.status,
 		});
 	}
+};
+
+export const editReport = async (data: SavedReport, moderator: Profile) => {
+	const reportsId = process.env.REPORTS_ID || '';
+	const reportsToken = process.env.REPORTS_TOKEN || '';
+
+	const webhookClient = new Discord.WebhookClient({
+		id: reportsId,
+		token: reportsToken,
+	});
+
+	const guild = client.guilds.cache.find(
+		(guild) => guild.name === process.env.SERVER
+	);
+
+	const channel = guild?.channels.cache.find(
+		(channel) => channel.id === process.env.REPORTS_CHANNEL_ID
+	) as TextChannel;
+
+	console.log(process.env.REPORTS_CHANNEL_ID);
+
+	const messageList = await channel.messages.fetch({ limit: 20 });
+
+	const message = messageList.get(data.discordId);
+
+	console.log(message);
+
+	const recievedEmbed = message?.embeds[0];
+
+	console.log(recievedEmbed);
+
+	const modPfp =
+		avatar(moderator?.avatarImage?.original.url.replace(/\?[0-9]+$/, '')) ??
+		undefined;
+
+	const embed = new MessageEmbed(recievedEmbed).setFooter(
+		`${moderator?.name} • ${data.status}`,
+		modPfp
+	);
+
+	console.log(embed);
+
+	const edited = webhookClient.editMessage(data.discordId, {
+		content: message?.content,
+		embeds: [embed],
+	});
+
+	simpleReportsStore({
+		id: data.id,
+		discordId: data.discordId,
+		status: data.status,
+	});
 };
 
 export default sendReport;

@@ -2,6 +2,7 @@ import { CommandInteractionOptionResolver, TextChannel } from 'discord.js';
 import fs from 'fs';
 import { client } from '../index';
 import { tokenToString } from 'typescript';
+import { SettingName, StoredChannel, StoredChannelHook } from './settings';
 
 const setWebhookChannel = async (
 	setting: SettingName,
@@ -51,13 +52,13 @@ export const readWebhookChannel = (setting: SettingName) => {
 		const webhook = fs.readFileSync(path, 'utf8');
 		const json = JSON.parse(webhook) as StoredChannel;
 
-		const textChannel = client.channels.cache.get(
-			json.channelId
-		) as TextChannel;
+		const textChannel = client.channels.cache.get(json.channelId);
+
+		console.log('TEXT CHANNEL' + textChannel);
 
 		return {
 			name: json.name,
-			channel: textChannel,
+			channelId: textChannel?.id,
 			webhookToken: json.webhookToken,
 			webhookId: json.webhookId,
 		} as unknown as StoredChannel;

@@ -1,20 +1,23 @@
+import { SettingName, StoredChannel, StoredChannelHook } from 'bot/settings';
 import {
 	ApplicationCommand,
 	ApplicationCommandPermissionData,
 	ApplicationCommandPermissions,
 	Client,
+	Guild,
 	GuildApplicationCommandPermissionData,
 	GuildResolvable,
 	Intents,
 	TextChannel,
+	User,
 } from 'discord.js';
 import { ApplicationCommandPermissionType } from 'discord.js/node_modules/discord-api-types';
 import setWebhookChannel, { readWebhookChannel } from './bot/saveChannel';
 import { Report } from './gen/kitsu';
 import { getServerSideProps } from './google/getProps';
 import unban from './kitsu/unban';
-import fetchReports from './reports/fetchReports';
-import sendReport from './reports/sendReports';
+import fetchReports, { FetchData } from './reports/fetchReports';
+import sendReport, { editReport } from './reports/sendReports';
 import checkDate from './util/checkDate';
 import { checkExists } from './util/ReportsStorage';
 import webhookLog from './webhookLog';
@@ -30,10 +33,26 @@ export const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 client.once('ready', async () => {
 	console.log('Ready!');
 
-	const permissionCommand = client.application?.commands.fetch();
+	// Setup permissions
+	const permissionCommand = await client.guilds?.cache
+		.find((guild) => guild.name === 'Kitsu')
+		?.commands.fetch();
 
-	console.log(await permissionCommand);
+	const permissions: ApplicationCommandPermissionData[] = [
+		{
+			id: '374927132327149568',
+			type: 'USER',
+			permission: true,
+		},
+	];
 
+	permissionCommand?.forEach((command) => {
+		console.log(`Fetched command ${command.name}`);
+		command.permissions.add({ permissions });
+		console.log(`Added permissions to command ${command.name}`);
+	});
+
+	// Initialise bot to use correct channels
 	const init = ['reports', 'logging', 'unbans'];
 
 	init.forEach((hookName) => {
@@ -59,7 +78,7 @@ client.on('interactionCreate', async (interaction) => {
 
 	if (commandName === 'permissions') {
 		if (role?.id) {
-			botRolePermissions(role.id, guild as GuildResolvable);
+			botRolePermissions(role.id, guild!);
 			interaction.reply({
 				content: `Gave <@${role.id}> permissions to use commands`,
 			});
@@ -103,20 +122,20 @@ client.on('interactionCreate', async (interaction) => {
 	}
 });
 
-const botRolePermissions = async (role: string, guild: GuildResolvable) => {
-	const commands = (await client.application?.commands.fetch())!.forEach(
-		async (command) => {
-			const permissions: ApplicationCommandPermissionData[] = [
-				{
-					id: role,
-					type: 'ROLE',
-					permission: true,
-				},
-			];
+const botRolePermissions = async (role: string, guild: Guild) => {
+	(await guild?.commands.fetch())!.forEach(async (command) => {
+		const permissions: ApplicationCommandPermissionData[] = [
+			{
+				id: role,
+				type: 'ROLE',
+				permission: true,
+			},
+		];
 
-			await command.permissions.set({ guild: guild, permissions: permissions });
-		}
-	);
+		await command.permissions.set({ permissions: permissions });
+
+		console.log('Gave a role permissions');
+	});
 };
 
 const initWebhookEnvironment = (hookName: string) => {
@@ -130,16 +149,20 @@ const webhookEnvironment = (commandName: string, hook: StoredChannel) => {
 		case 'logging':
 			console.log('logging');
 			process.env.LOGGING_ID = hook?.webhookId;
+			process.env.LOGGING_CHANNEL_ID = hook?.channelId;
 			process.env.LOGGING_TOKEN = hook?.webhookToken;
 			break;
 		case 'reports':
 			console.log('reports');
 			process.env.REPORTS_ID = hook?.webhookId;
+			process.env.REPORTS_CHANNEL_ID = hook?.channelId;
 			process.env.REPORTS_TOKEN = hook?.webhookToken;
+			console.log(process.env.REPORTS_CHANNEL_ID);
 			break;
 		case 'unbans':
 			console.log('unbans');
 			process.env.UNBAN_ID = hook?.webhookId;
+			process.env.UNBAN_CHANNEL_ID = hook?.channelId;
 			process.env.UNBAN_TOKEN = hook?.webhookToken;
 			break;
 	}
@@ -179,34 +202,60 @@ const unbanFunction = async () => {
 };
 
 const reportsFunction = async () => {
-	const { data, error, partial } = await fetchReports();
+	const { data, error, partial } = await fetchReports(FetchData.All);
 
 	if (error && partial) {
 		webhookLog('Reports Partial Error', error.message);
 	}
-
 	if (error && !partial) {
-		throw error.message;
+		webhookLog('Reports Error', error.message);
 	}
+	if (data) {
+		const nodes = data.reports?.nodes as Report[];
+		reportsSendHandler(nodes, false);
+	}
+};
 
-	const nodes = data.reports?.nodes as Report[];
+const reportsPartial = async () => {
+	const { data, error, partial } = await fetchReports(FetchData.Partial);
 
+	if (error && partial) {
+		webhookLog('Reports Partial Error', error.message);
+	}
+	if (error && !partial) {
+		webhookLog('Reports Error', error.message);
+	}
+	if (data) {
+		const nodes = data.reports?.nodes as Report[];
+		reportsSendHandler(nodes, true);
+	}
+};
+
+const reportsSendHandler = (nodes: Report[], update?: boolean) => {
 	let reports = [...nodes];
 
 	if (reports) {
 		reports = reports.reverse();
 
 		for (let i = 0; i < reports.length; i++) {
-			const timeout = 1000 + i * 2000;
+			const timeout = 1000 + i * 100;
 
 			if (reports[i]) {
 				const existing = checkExists(reports[i].id);
 
 				setTimeout(function () {
-					if (!existing) {
+					if (existing && update && existing.status !== reports[i].status) {
+						editReport(
+							{
+								id: reports[i].id,
+								discordId: existing.discordId,
+								status: reports[i].status,
+							},
+							reports[i].moderator!
+						);
+					}
+					if (!existing && !update) {
 						sendReport(reports[i]);
-					} else if (existing.status !== reports[i].status) {
-						sendReport(reports[i], existing);
 					}
 				}, timeout);
 			}
@@ -220,15 +269,17 @@ const main = () => {
 	} else {
 		try {
 			try {
-				reportsFunction();
-				setInterval(() => reportsFunction(), 60000);
+				reportsPartial();
+				// setInterval(() => reportsPartial(), 30000);
+				// reportsFunction();
+				// setInterval(() => reportsFunction(), 60000);
 			} catch {
 				throw 'Failed somewhere within the reports part';
 			}
 
 			try {
-				unbanFunction();
-				setInterval(() => unbanFunction(), 1800000);
+				// unbanFunction();
+				// setInterval(() => unbanFunction(), 1800000);
 			} catch {
 				webhookLog('Crashed', 'Failed somewhere within the unbanning part');
 			}
