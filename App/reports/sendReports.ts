@@ -241,9 +241,7 @@ const sendReport = async (report: Report, update?: SavedReport) => {
 			avatarURL: avatar(report.reporter.avatarImage?.original.url),
 			embeds: [embed],
 			components: [
-				componentRow(userRow),
-				componentRow(linkSource()),
-				componentRow(openReports),
+				componentRow(userRow.concat(linkSource().concat(openReports))),
 			],
 		});
 
@@ -294,7 +292,7 @@ export const editReport = async (data: SavedReport, moderator: Profile) => {
 		embeds: [embed],
 	});
 
-	simpleReportsStore({
+	simpleUpdateReportStore({
 		id: data.id,
 		discordId: data.discordId,
 		status: data.status,

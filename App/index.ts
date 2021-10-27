@@ -203,6 +203,8 @@ const unbanFunction = async () => {
 const reportsFunction = async () => {
 	const { data, error, partial } = await fetchReports(FetchData.All);
 
+	console.log('Fetched Full Reports');
+
 	if (error && partial) {
 		webhookLog('Reports Partial Error', error.message);
 	}
@@ -217,6 +219,8 @@ const reportsFunction = async () => {
 
 const reportsPartial = async () => {
 	const { data, error, partial } = await fetchReports(FetchData.Partial);
+
+	console.log('Fetched Partial Reports');
 
 	if (error && partial) {
 		webhookLog('Reports Partial Error', error.message);
@@ -237,7 +241,7 @@ const reportsSendHandler = (nodes: Report[], update?: boolean) => {
 		reports = reports.reverse();
 
 		for (let i = 0; i < reports.length; i++) {
-			const timeout = 1000 + i * 100;
+			const timeout = 1000 + i * 2000;
 
 			if (reports[i]) {
 				const existing = checkExists(reports[i].id);
