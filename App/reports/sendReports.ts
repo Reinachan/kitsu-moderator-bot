@@ -274,17 +274,11 @@ export const editReport = async (data: SavedReport, moderator: Profile) => {
 		(channel) => channel.id === process.env.REPORTS_CHANNEL_ID
 	) as TextChannel;
 
-	console.log(process.env.REPORTS_CHANNEL_ID);
-
 	const messageList = await channel.messages.fetch({ limit: 20 });
 
 	const message = messageList.get(data.discordId);
 
-	console.log(message);
-
 	const recievedEmbed = message?.embeds[0];
-
-	console.log(recievedEmbed);
 
 	const modPfp =
 		avatar(moderator?.avatarImage?.original.url.replace(/\?[0-9]+$/, '')) ??
@@ -294,8 +288,6 @@ export const editReport = async (data: SavedReport, moderator: Profile) => {
 		`${moderator?.name} • ${data.status}`,
 		modPfp
 	);
-
-	console.log(embed);
 
 	const edited = webhookClient.editMessage(data.discordId, {
 		content: message?.content,

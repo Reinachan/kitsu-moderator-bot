@@ -14,8 +14,6 @@ const client = async () => {
 		'content-type': 'application/json',
 	};
 
-	console.log(requestHeaders);
-
 	const link = createHttpLink({
 		uri: 'https://kitsu.io/api/graphql',
 		fetch: fetch,

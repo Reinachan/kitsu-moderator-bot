@@ -47,7 +47,6 @@ client.once('ready', async () => {
 	];
 
 	permissionCommand?.forEach((command) => {
-		console.log(`Fetched command ${command.name}`);
 		command.permissions.add({ permissions });
 		console.log(`Added permissions to command ${command.name}`);
 	});
@@ -269,17 +268,19 @@ const main = () => {
 	} else {
 		try {
 			try {
-				reportsPartial();
-				// setInterval(() => reportsPartial(), 30000);
-				// reportsFunction();
-				// setInterval(() => reportsFunction(), 60000);
+				reportsFunction();
+				setInterval(() => reportsFunction(), 60000);
+				setTimeout(() => {
+					reportsPartial();
+					setInterval(() => reportsPartial(), 60000);
+				}, 30000);
 			} catch {
 				throw 'Failed somewhere within the reports part';
 			}
 
 			try {
-				// unbanFunction();
-				// setInterval(() => unbanFunction(), 1800000);
+				unbanFunction();
+				setInterval(() => unbanFunction(), 1800000);
 			} catch {
 				webhookLog('Crashed', 'Failed somewhere within the unbanning part');
 			}
