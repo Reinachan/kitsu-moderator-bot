@@ -1,41 +1,41 @@
 {
-	// This is an alias to @tsconfig/node12: https://github.com/tsconfig/bases
-	"extends": "ts-node/node12/tsconfig.json",
+  // This is an alias to @tsconfig/node12: https://github.com/tsconfig/bases
+  "extends": "ts-node/node12/tsconfig.json",
 
-	// Most ts-node options can be specified here using their programmatic names.
-	"ts-node": {
-		// It is faster to skip typechecking.
-		// Remove if you want ts-node to do typechecking.
-		"transpileOnly": true,
+  // Most ts-node options can be specified here using their programmatic names.
+  "ts-node": {
+    // It is faster to skip typechecking.
+    // Remove if you want ts-node to do typechecking.
+    "transpileOnly": true,
 
-		"files": true,
+    "files": true,
 
-		"compilerOptions": {
-			// compilerOptions specified here will override those declared below,
-			// but *only* in ts-node.  Useful if you want ts-node and tsc to use
-			// different options with a single tsconfig.json.
-			"module": "CommonJS",
-			"moduleResolution": "node",
+    "compilerOptions": {
+      // compilerOptions specified here will override those declared below,
+      // but *only* in ts-node.  Useful if you want ts-node and tsc to use
+      // different options with a single tsconfig.json.
+      "module": "CommonJS",
+      "moduleResolution": "node",
 
-			"allowJs": false,
-			"baseUrl": "./App",
-			"paths": {
-				"App": ["./App"]
-			},
-			"allowSyntheticDefaultImports": true,
-			"pretty": true
-		}
-	},
-	"compilerOptions": {
-		// typescript options here
-		"module": "ESNext",
-		"allowJs": false,
-		"moduleResolution": "node",
-		"baseUrl": "./App",
-		"paths": {
-			"App": ["./App"]
-		},
-		"allowSyntheticDefaultImports": true,
-		"pretty": true
-	}
+      "allowJs": false,
+      "baseUrl": "./App",
+      "paths": {
+        "App": ["./App"]
+      },
+      "allowSyntheticDefaultImports": true,
+      "pretty": true
+    }
+  },
+  "compilerOptions": {
+    // typescript options here
+    "module": "ESNext",
+    "allowJs": false,
+    "moduleResolution": "node",
+    "baseUrl": "./App",
+    "paths": {
+      "App": ["./App"]
+    },
+    "allowSyntheticDefaultImports": true,
+    "pretty": true
+  }
 }

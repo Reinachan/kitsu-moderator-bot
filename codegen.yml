@@ -1,17 +1,39 @@
 overwrite: true
 schema: 'https://kitsu.io/api/graphql'
-documents: 'graphql/**/*.graphql'
+documents: '**/*.graphql'
+hooks:
+  afterAllFileWrite:
+    - prettier --write
+
 generates:
+  ./graphql.schema.json:
+    plugins:
+      - introspection
+
   App/gen/kitsu.ts:
     plugins:
       - typescript
       - typescript-operations
       - typescript-graphql-request
-  ./graphql.schema.json:
-    plugins:
-      - introspection
+      - fragment-matcher
+    config:
+      immutableTypes: true
+      scalars:
+        Map: 'Record<string, string>'
+        JSON: 'Record<string, unknown>'
+        Date: 'string'
+        ISO8601Date: 'Date'
+        ISO8601DateTime: 'Date'
+
   App/gen/query.ts:
     plugins:
       - typescript-document-nodes
     config:
       namePrefix: 'gql'
+      immutableTypes: true
+      scalars:
+        Map: 'Record<string, string>'
+        JSON: 'Record<string, unknown>'
+        Date: 'string'
+        ISO8601Date: 'Date'
+        ISO8601DateTime: 'Date'

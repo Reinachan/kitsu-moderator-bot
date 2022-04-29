@@ -1,41 +1,40 @@
-import { GraphQLClient } from 'graphql-request';
 import { GqlReports, GqlReportsPartial } from '../gen/query'; // THIS FILE IS THE GENERATED FILE
-import { ReportsQuery } from '../gen/kitsu';
-import authorize from '../kitsu/auth';
-import { checkExists } from '../util/ReportsStorage';
+import { ReportsPartialQuery, ReportsQuery } from '../gen/kitsu';
 
 import client from '../ApolloGraphql';
-import { ApolloQueryResult, gql } from '@apollo/client/core';
+import { ApolloQueryResult } from '@apollo/client/core';
 
 export const enum FetchData {
-	All = 1,
-	Partial = 2,
+  All = 1,
+  Partial = 2,
 }
 
-const fetchReports = async (fetchData: FetchData) => {
-	const variables = {
-		first: 20,
-	};
+const fetchReports = async <T extends ReportsQuery | ReportsPartialQuery>(
+  fetchData: FetchData
+): Promise<ApolloQueryResult<T>> => {
+  const variables = {
+    first: 20,
+  };
 
-	const get = await client();
+  const get = await client();
 
-	if (fetchData === FetchData.All) {
-		const res = await get.query<ReportsQuery>({
-			query: GqlReports,
-			variables: variables,
-			errorPolicy: 'all',
-		});
+  if (fetchData === FetchData.All) {
+    const res = await get.query<T>({
+      query: GqlReports,
+      variables: variables,
+      errorPolicy: 'all',
+    });
 
-		return res;
-	} else {
-		const res = await get.query<ReportsQuery>({
-			query: GqlReportsPartial,
-			variables: variables,
-			errorPolicy: 'all',
-		});
+    return res;
+  } else {
+    const res = await get.query<T>({
+      query: GqlReportsPartial,
+      variables: variables,
+      errorPolicy: 'all',
+    });
 
-		return res;
-	}
+    return res;
+  }
 };
 
 // const fetchReportsDeprecated = async () => {

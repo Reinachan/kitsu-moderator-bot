@@ -1,25 +1,34 @@
 # Write your query or mutation here
 query ReportsPartial($first: Int!) {
-	reports(first: $first) {
-		nodes {
-			createdAt
-			id
-			status
-			moderator {
-				...User
-			}
-		}
-	}
+  reports(first: $first) {
+    nodes {
+      createdAt
+      id
+      status
+      moderator {
+        ...User
+      }
+    }
+  }
+}
+
+fragment ReportPartial on Report {
+  createdAt
+  id
+  status
+  moderator {
+    ...User
+  }
 }
 
 fragment User on Profile {
-	id
-	name
-	slug
-	url
-	avatarImage {
-		original {
-			url
-		}
-	}
+  id
+  name
+  slug
+  url
+  avatarImage {
+    original {
+      url
+    }
+  }
 }

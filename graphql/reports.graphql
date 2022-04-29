@@ -1,76 +1,90 @@
 query Reports($first: Int!) {
-	reports(first: $first) {
-		nodes {
-			createdAt
-			id
-			explanation
-			reason
-			status
-			updatedAt
+  reports(first: $first) {
+    nodes {
+      ...Report
+    }
+  }
+}
 
-			reporter {
-				...User
-			}
-			moderator {
-				...User
-			}
+fragment Report on Report {
+  createdAt
+  id
+  explanation
+  reason
+  status
+  updatedAt
 
-			naughty {
-				__typename
-				... on Comment {
-					id
-					author {
-						...User
-					}
-					content
-					post {
-						id
-					}
-				}
-				... on Post {
-					id
-					author {
-						...User
-					}
-					content
-					postMedia: media {
-						...Media
-					}
-				}
-				... on MediaReaction {
-					id
-					author {
-						...User
-					}
-					reaction
-					media {
-						...Media
-					}
-				}
-			}
-		}
-	}
+  reporter {
+    ...User
+  }
+  moderator {
+    ...User
+  }
+
+  naughty {
+    __typename
+    ... on Comment {
+      id
+      author {
+        ...User
+      }
+      content
+      post {
+        id
+      }
+    }
+    ... on Post {
+      id
+      author {
+        ...User
+      }
+      content
+      postMedia: media {
+        ...Media
+      }
+    }
+    ... on MediaReaction {
+      id
+      author {
+        ...User
+      }
+      reaction
+      media {
+        ...Media
+      }
+    }
+    ... on Review {
+      id
+      author {
+        ...User
+      }
+      reviewContent: content
+      media {
+        ...Media
+      }
+    }
+  }
 }
 
 fragment Media on Media {
-	titles {
-		canonical
-	}
-	posterImage {
-		original {
-			url
-		}
-	}
+  titles {
+    canonical
+  }
+  posterImage {
+    original {
+      url
+    }
+  }
 }
 
 fragment User on Profile {
-	id
-	name
-	slug
-	url
-	avatarImage {
-		original {
-			url
-		}
-	}
+  id
+  name
+  slug
+  url
+  avatarImage {
+    original {
+      url
+    }
+  }
 }

@@ -1,0 +1,5 @@
+schema: 'https://kitsu.io/api/graphql';
+documents: '**/*.graphql';
+exteextensions:
+  languageService:
+    cacheSchemaFileForLookup: true

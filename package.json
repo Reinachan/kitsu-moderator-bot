@@ -1,46 +1,44 @@
 {
-	"name": "kitsu-unban",
-	"version": "1.0.0",
-	"description": "Unbans users on a specified date using a Google Sheet",
-	"main": "App/index.ts",
-	"scripts": {
-		"start": "ts-node App/index.ts",
-		"test": "echo \"Error: no test specified\" && exit 1",
-		"gql": "graphql-codegen --config codegen.yml",
-		"reg-commands": "ts-node App/registerCommands.ts"
-	},
-	"keywords": [
-		"Kitsu"
-	],
-	"author": "Reinachan",
-	"license": "MIT",
-	"dependencies": {
-		"@apollo/client": "^3.4.7",
-		"@discordjs/builders": "^0.6.0",
-		"@discordjs/rest": "^0.1.0-canary.0",
-		"@graphql-codegen/cli": "1.21.7",
-		"@graphql-codegen/introspection": "1.18.2",
-		"@graphql-codegen/typescript": "1.23.0",
-		"@graphql-codegen/typescript-graphql-request": "^3.2.5",
-		"@graphql-codegen/typescript-operations": "1.18.4",
-		"@types/node": "^16.3.2",
-		"@types/node-fetch": "^2.5.11",
-		"axios": "^0.21.1",
-		"cross-fetch": "^3.1.4",
-		"discord-api-types": "^0.23.1",
-		"discord.js": "^13.1.0",
-		"dotenv": "^10.0.0",
-		"googleapis": "^81.0.0",
-		"graphql": "^15.5.1",
-		"graphql-request": "^3.4.0",
-		"hookcord": "^2.0.2",
-		"jshint": "^2.13.0",
-		"node-fetch": "^2.6.1",
-		"ts-node": "^10.1.0",
-		"tslib": "^2.3.0",
-		"typescript": "^4.3.5"
-	},
-	"devDependencies": {
-		"@graphql-codegen/typescript-document-nodes": "^2.1.6"
-	}
+  "name": "kitsu-unban",
+  "version": "1.0.0",
+  "description": "Unbans users on a specified date using a Google Sheet",
+  "main": "App/index.ts",
+  "scripts": {
+    "start": "ts-node App/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "gql": "graphql-codegen --config codegen.yml",
+    "reg-commands": "ts-node App/registerCommands.ts"
+  },
+  "keywords": [
+    "Kitsu"
+  ],
+  "author": "Reinachan",
+  "license": "MIT",
+  "dependencies": {
+    "@apollo/client": "^3.6.1",
+    "@discordjs/builders": "^0.13.0",
+    "@discordjs/rest": "^0.4.1",
+    "axios": "^0.21.1",
+    "cross-fetch": "^3.1.4",
+    "discord-api-types": "^0.23.1",
+    "discord.js": "^13.6.0",
+    "dotenv": "^10.0.0",
+    "googleapis": "^81.0.0",
+    "graphql": "^16.4.0",
+    "node-fetch": "^2.6.1",
+    "ts-node": "^10.1.0"
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "^2.6.2",
+    "@graphql-codegen/fragment-matcher": "^3.2.1",
+    "@graphql-codegen/introspection": "^2.1.1",
+    "@graphql-codegen/typescript": "^2.4.8",
+    "@graphql-codegen/typescript-document-nodes": "^2.2.8",
+    "@graphql-codegen/typescript-graphql-request": "^4.4.5",
+    "@graphql-codegen/typescript-operations": "^2.3.5",
+    "@types/node": "^17.0.30",
+    "@types/node-fetch": "^2.5.11",
+    "tslib": "^2.4.0",
+    "typescript": "^4.6.4"
+  }
 }
