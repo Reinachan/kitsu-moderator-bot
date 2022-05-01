@@ -1,8 +1,7 @@
-import { CommandInteractionOptionResolver, TextChannel } from 'discord.js';
+import { TextChannel } from 'discord.js';
 import fs from 'fs';
 import { client } from '../index';
-import { tokenToString } from 'typescript';
-import { SettingName, StoredChannel, StoredChannelHook } from './settings';
+import { SettingName, StoredChannel } from './settings';
 
 const setWebhookChannel = async (
 	setting: SettingName,
@@ -19,7 +18,7 @@ const setWebhookChannel = async (
 			channel
 				.createWebhook(setting, {
 					avatar:
-						'https://media.kitsu.io/users/avatars/172892/large.png?1618344125',
+						'https://media.kitsu.io/users/avatars/172892/large.png',
 				})
 				.then((webhook) => {
 					if (logDir) {
@@ -37,7 +36,7 @@ const setWebhookChannel = async (
 				})
 				.catch(console.error);
 		}
-	);
+	).catch(console.error);
 
 	return done;
 

@@ -32,9 +32,7 @@ export const checkExists = (id: string): SavedReport | null => {
 	reports.reports.find((report) => {
 		if (report.id === id) {
 			data = report;
-			return true;
 		}
-		return false;
 	});
 
 	return data;

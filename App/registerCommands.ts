@@ -10,7 +10,7 @@ const commands = [
 		.setDescription(
 			'Choose which roles can do restricted commands with this bot'
 		)
-		.setDefaultPermission(false)
+		// .setDefaultPermission(false)
 		.addRoleOption((option) =>
 			option
 				.setName('role')
@@ -22,7 +22,7 @@ const commands = [
 	new SlashCommandBuilder()
 		.setName('logging')
 		.setDescription('Select channel as the channel to log to')
-		.setDefaultPermission(false)
+		// .setDefaultPermission(false)
 		.addChannelOption((option) =>
 			option
 				.setName('channel')
@@ -42,7 +42,7 @@ const commands = [
 	new SlashCommandBuilder()
 		.setName('reports')
 		.setDescription('Select channel to send reports to')
-		.setDefaultPermission(false)
+		// .setDefaultPermission(false)
 		.addChannelOption((option) =>
 			option
 				.setName('channel')
@@ -52,7 +52,7 @@ const commands = [
 	new SlashCommandBuilder()
 		.setName('start')
 		.setDescription('Start the bot after initialising webhooks')
-		.setDefaultPermission(false),
+		// .setDefaultPermission(false),
 ].map((command) => command.toJSON());
 
 const clientId = process.env.BOT_CLIENT_ID;

@@ -86,7 +86,7 @@ const linkButton = (label: string, url: string): MessageButtonOptions => {
 
 const avatar = (link: string | undefined) => {
   if (link === '/avatars/original/missing.png' || link === undefined) {
-    return 'https://media.kitsu.io/users/avatars/172892/large.png?1618344125';
+    return 'https://media.kitsu.io/users/avatars/172892/large.png';
   }
   return link;
 };
@@ -100,7 +100,7 @@ const generateDescription = (
     return `Potential spoiler for: ${mediaTitle}\n\n||${truncate(content)}||`;
   }
   if (spoiler) {
-    return `||${truncate(content)}`;
+    return `||${truncate(content)}||`;
   }
   return truncate(content);
 };
@@ -288,21 +288,25 @@ export const editReport = async (
     avatar(moderator?.avatarImage?.original.url.replace(/\?[0-9]+$/, '')) ??
     undefined;
 
-  const embed = new MessageEmbed(recievedEmbed).setFooter(
-    `${moderator?.name} • ${data.status}`,
-    modPfp
-  );
+  const embed = new MessageEmbed(recievedEmbed).setFooter({
+    text: `${moderator?.name} • ${data.status}`,
+    iconURL: modPfp
+  });
 
-  await webhookClient.editMessage(data.discordId, {
+  const res = await webhookClient.editMessage(data.discordId, {
     content: message?.content,
     embeds: [embed],
   });
 
-  simpleUpdateReportStore({
-    id: data.id,
-    discordId: data.discordId,
-    status: data.status,
-  });
+  console.log(res)
+
+  if (res.content) {
+    simpleUpdateReportStore({
+      id: data.id,
+      discordId: data.discordId,
+      status: data.status,
+    });
+  }
 };
 
 export default sendReport;

@@ -149,6 +149,7 @@ const webhookEnvironment = (commandName: string, hook: StoredChannel) => {
       process.env.LOGGING_ID = hook?.webhookId;
       process.env.LOGGING_CHANNEL_ID = hook?.channelId;
       process.env.LOGGING_TOKEN = hook?.webhookToken;
+      console.log(process.env.LOGGING_ID, process.env.LOGGING_CHANNEL_ID, process.env.LOGGING_TOKEN)
       break;
     case 'reports':
       console.log('reports');
@@ -239,9 +240,9 @@ const reportsSendHandler = (
   nodes: ReportFragment[] | ReportPartialFragment[] | null | undefined,
   update?: boolean
 ) => {
-  const reports = nodes?.reverse();
+  if (nodes) {
+    const reports = [...nodes]?.reverse();
 
-  if (reports) {
     for (let i = 0; i < reports.length; i++) {
       const timeout = 1000 + i * 2000;
 
@@ -249,7 +250,7 @@ const reportsSendHandler = (
         const existing = checkExists(reports[i].id);
 
         setTimeout(async () => {
-          if (existing && update && existing.status !== reports[i].status) {
+          if (existing && update && existing?.status !== reports[i]?.status) {
             await editReport(
               {
                 id: reports[i].id,
@@ -257,7 +258,7 @@ const reportsSendHandler = (
                 status: reports[i].status,
               },
               reports[i].moderator
-            );
+            ); 
           }
           if (!existing && !update) {
             await sendReport(reports[i] as ReportFragment);
