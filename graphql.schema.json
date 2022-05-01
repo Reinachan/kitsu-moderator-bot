@@ -563,13 +563,9 @@
             "description": "A large banner image for this media",
             "args": [],
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Image",
-                "ofType": null
-              }
+              "kind": "OBJECT",
+              "name": "Image",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -1169,13 +1165,9 @@
             "description": "The poster image of this media",
             "args": [],
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Image",
-                "ofType": null
-              }
+              "kind": "OBJECT",
+              "name": "Image",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -9811,13 +9803,9 @@
             "description": "A large banner image for this media",
             "args": [],
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Image",
-                "ofType": null
-              }
+              "kind": "OBJECT",
+              "name": "Image",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -10413,13 +10401,9 @@
             "description": "The poster image of this media",
             "args": [],
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Image",
-                "ofType": null
-              }
+              "kind": "OBJECT",
+              "name": "Image",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -12237,13 +12221,9 @@
             "description": "A large banner image for this media",
             "args": [],
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Image",
-                "ofType": null
-              }
+              "kind": "OBJECT",
+              "name": "Image",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -12722,13 +12702,9 @@
             "description": "The poster image of this media",
             "args": [],
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Image",
-                "ofType": null
-              }
+              "kind": "OBJECT",
+              "name": "Image",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -20504,13 +20480,9 @@
             "description": "The entity that the report is related to",
             "args": [],
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "UNION",
-                "name": "ReportItemUnion",
-                "ofType": null
-              }
+              "kind": "UNION",
+              "name": "ReportItemUnion",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null

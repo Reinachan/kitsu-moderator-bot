@@ -123,7 +123,7 @@ export type Anime = Episodic &
     /** The rank of this media by rating */
     readonly averageRatingRank?: Maybe<Scalars['Int']>;
     /** A large banner image for this media */
-    readonly bannerImage: Image;
+    readonly bannerImage?: Maybe<Image>;
     /** A list of categories for this media */
     readonly categories: CategoryConnection;
     /** The characters who starred in this media */
@@ -160,7 +160,7 @@ export type Anime = Episodic &
      */
     readonly originalLocale?: Maybe<Scalars['String']>;
     /** The poster image of this media */
-    readonly posterImage: Image;
+    readonly posterImage?: Maybe<Image>;
     /** All posts that tag this media. */
     readonly posts: PostConnection;
     /** The companies which helped to produce this media */
@@ -1517,7 +1517,7 @@ export type Manga = Media &
     /** The rank of this media by rating */
     readonly averageRatingRank?: Maybe<Scalars['Int']>;
     /** A large banner image for this media */
-    readonly bannerImage: Image;
+    readonly bannerImage?: Maybe<Image>;
     /** A list of categories for this media */
     readonly categories: CategoryConnection;
     /** The number of chapters in this manga. */
@@ -1554,7 +1554,7 @@ export type Manga = Media &
      */
     readonly originalLocale?: Maybe<Scalars['String']>;
     /** The poster image of this media */
-    readonly posterImage: Image;
+    readonly posterImage?: Maybe<Image>;
     /** All posts that tag this media. */
     readonly posts: PostConnection;
     /** The companies which helped to produce this media */
@@ -1880,7 +1880,7 @@ export type Media = {
   /** The rank of this media by rating */
   readonly averageRatingRank?: Maybe<Scalars['Int']>;
   /** A large banner image for this media */
-  readonly bannerImage: Image;
+  readonly bannerImage?: Maybe<Image>;
   /** A list of categories for this media */
   readonly categories: CategoryConnection;
   /** The characters who starred in this media */
@@ -1910,7 +1910,7 @@ export type Media = {
    */
   readonly originalLocale?: Maybe<Scalars['String']>;
   /** The poster image of this media */
-  readonly posterImage: Image;
+  readonly posterImage?: Maybe<Image>;
   /** All posts that tag this media. */
   readonly posts: PostConnection;
   /** The companies which helped to produce this media */
@@ -3172,7 +3172,7 @@ export type Report = WithTimestamps & {
   /** The moderator who responded to this report */
   readonly moderator?: Maybe<Profile>;
   /** The entity that the report is related to */
-  readonly naughty: ReportItemUnion;
+  readonly naughty?: Maybe<ReportItemUnion>;
   /** The reason for why the report was made */
   readonly reason: ReportReasonEnum;
   /** The user who made this report */
@@ -3729,7 +3729,7 @@ export type ReportsQuery = {
           };
         } | null;
       } | null;
-      readonly naughty:
+      readonly naughty?:
         | {
             readonly __typename: 'Comment';
             readonly id: string;
@@ -3778,13 +3778,13 @@ export type ReportsQuery = {
                     readonly __typename?: 'TitlesList';
                     readonly canonical: string;
                   };
-                  readonly posterImage: {
+                  readonly posterImage?: {
                     readonly __typename?: 'Image';
                     readonly original: {
                       readonly __typename?: 'ImageView';
                       readonly url: string;
                     };
-                  };
+                  } | null;
                 }
               | {
                   readonly __typename?: 'Manga';
@@ -3792,13 +3792,13 @@ export type ReportsQuery = {
                     readonly __typename?: 'TitlesList';
                     readonly canonical: string;
                   };
-                  readonly posterImage: {
+                  readonly posterImage?: {
                     readonly __typename?: 'Image';
                     readonly original: {
                       readonly __typename?: 'ImageView';
                       readonly url: string;
                     };
-                  };
+                  } | null;
                 };
           }
         | {
@@ -3826,13 +3826,13 @@ export type ReportsQuery = {
                     readonly __typename?: 'TitlesList';
                     readonly canonical: string;
                   };
-                  readonly posterImage: {
+                  readonly posterImage?: {
                     readonly __typename?: 'Image';
                     readonly original: {
                       readonly __typename?: 'ImageView';
                       readonly url: string;
                     };
-                  };
+                  } | null;
                 }
               | {
                   readonly __typename?: 'Manga';
@@ -3840,13 +3840,13 @@ export type ReportsQuery = {
                     readonly __typename?: 'TitlesList';
                     readonly canonical: string;
                   };
-                  readonly posterImage: {
+                  readonly posterImage?: {
                     readonly __typename?: 'Image';
                     readonly original: {
                       readonly __typename?: 'ImageView';
                       readonly url: string;
                     };
-                  };
+                  } | null;
                 }
               | null;
           }
@@ -3875,13 +3875,13 @@ export type ReportsQuery = {
                     readonly __typename?: 'TitlesList';
                     readonly canonical: string;
                   };
-                  readonly posterImage: {
+                  readonly posterImage?: {
                     readonly __typename?: 'Image';
                     readonly original: {
                       readonly __typename?: 'ImageView';
                       readonly url: string;
                     };
-                  };
+                  } | null;
                 }
               | {
                   readonly __typename?: 'Manga';
@@ -3889,15 +3889,16 @@ export type ReportsQuery = {
                     readonly __typename?: 'TitlesList';
                     readonly canonical: string;
                   };
-                  readonly posterImage: {
+                  readonly posterImage?: {
                     readonly __typename?: 'Image';
                     readonly original: {
                       readonly __typename?: 'ImageView';
                       readonly url: string;
                     };
-                  };
+                  } | null;
                 };
-          };
+          }
+        | null;
     } | null> | null;
   } | null;
 };
@@ -3938,7 +3939,7 @@ export type ReportFragment = {
       };
     } | null;
   } | null;
-  readonly naughty:
+  readonly naughty?:
     | {
         readonly __typename: 'Comment';
         readonly id: string;
@@ -3984,13 +3985,13 @@ export type ReportFragment = {
                 readonly __typename?: 'TitlesList';
                 readonly canonical: string;
               };
-              readonly posterImage: {
+              readonly posterImage?: {
                 readonly __typename?: 'Image';
                 readonly original: {
                   readonly __typename?: 'ImageView';
                   readonly url: string;
                 };
-              };
+              } | null;
             }
           | {
               readonly __typename?: 'Manga';
@@ -3998,13 +3999,13 @@ export type ReportFragment = {
                 readonly __typename?: 'TitlesList';
                 readonly canonical: string;
               };
-              readonly posterImage: {
+              readonly posterImage?: {
                 readonly __typename?: 'Image';
                 readonly original: {
                   readonly __typename?: 'ImageView';
                   readonly url: string;
                 };
-              };
+              } | null;
             };
       }
     | {
@@ -4032,13 +4033,13 @@ export type ReportFragment = {
                 readonly __typename?: 'TitlesList';
                 readonly canonical: string;
               };
-              readonly posterImage: {
+              readonly posterImage?: {
                 readonly __typename?: 'Image';
                 readonly original: {
                   readonly __typename?: 'ImageView';
                   readonly url: string;
                 };
-              };
+              } | null;
             }
           | {
               readonly __typename?: 'Manga';
@@ -4046,13 +4047,13 @@ export type ReportFragment = {
                 readonly __typename?: 'TitlesList';
                 readonly canonical: string;
               };
-              readonly posterImage: {
+              readonly posterImage?: {
                 readonly __typename?: 'Image';
                 readonly original: {
                   readonly __typename?: 'ImageView';
                   readonly url: string;
                 };
-              };
+              } | null;
             }
           | null;
       }
@@ -4081,13 +4082,13 @@ export type ReportFragment = {
                 readonly __typename?: 'TitlesList';
                 readonly canonical: string;
               };
-              readonly posterImage: {
+              readonly posterImage?: {
                 readonly __typename?: 'Image';
                 readonly original: {
                   readonly __typename?: 'ImageView';
                   readonly url: string;
                 };
-              };
+              } | null;
             }
           | {
               readonly __typename?: 'Manga';
@@ -4095,15 +4096,16 @@ export type ReportFragment = {
                 readonly __typename?: 'TitlesList';
                 readonly canonical: string;
               };
-              readonly posterImage: {
+              readonly posterImage?: {
                 readonly __typename?: 'Image';
                 readonly original: {
                   readonly __typename?: 'ImageView';
                   readonly url: string;
                 };
-              };
+              } | null;
             };
-      };
+      }
+    | null;
 };
 
 type Media_Anime_Fragment = {
@@ -4112,13 +4114,13 @@ type Media_Anime_Fragment = {
     readonly __typename?: 'TitlesList';
     readonly canonical: string;
   };
-  readonly posterImage: {
+  readonly posterImage?: {
     readonly __typename?: 'Image';
     readonly original: {
       readonly __typename?: 'ImageView';
       readonly url: string;
     };
-  };
+  } | null;
 };
 
 type Media_Manga_Fragment = {
@@ -4127,13 +4129,13 @@ type Media_Manga_Fragment = {
     readonly __typename?: 'TitlesList';
     readonly canonical: string;
   };
-  readonly posterImage: {
+  readonly posterImage?: {
     readonly __typename?: 'Image';
     readonly original: {
       readonly __typename?: 'ImageView';
       readonly url: string;
     };
-  };
+  } | null;
 };
 
 export type MediaFragment = Media_Anime_Fragment | Media_Manga_Fragment;

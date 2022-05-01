@@ -1,4 +1,6 @@
 import Discord, {
+  BaseMessageComponentOptions,
+  MessageActionRowComponentResolvable,
   MessageActionRowOptions,
   MessageButtonOptions,
   MessageEmbed,
@@ -22,7 +24,7 @@ interface NaughtyContent {
 const naughtyContent = (
   naughty: ReportFragment['naughty']
 ): NaughtyContent | undefined => {
-  if (naughty.__typename === 'Post') {
+  if (naughty?.__typename === 'Post') {
     return {
       id: naughty.id,
       reason: 'posts',
@@ -31,7 +33,7 @@ const naughtyContent = (
       media: naughty.postMedia?.titles?.canonical,
     };
   }
-  if (naughty.__typename === 'Comment') {
+  if (naughty?.__typename === 'Comment') {
     return {
       id: naughty.id,
       reason: 'comments',
@@ -39,7 +41,7 @@ const naughtyContent = (
       source: naughty?.post?.id,
     };
   }
-  if (naughty.__typename === 'MediaReaction') {
+  if (naughty?.__typename === 'MediaReaction') {
     return {
       id: naughty.id,
       reason: 'media-reactions',
@@ -47,7 +49,7 @@ const naughtyContent = (
       media: naughty.media?.titles?.canonical,
     };
   }
-  if (naughty.__typename === 'Review') {
+  if (naughty?.__typename === 'Review') {
     return {
       id: naughty.id,
       reason: 'reviews',
@@ -75,7 +77,10 @@ const truncate = (description: string) => {
   return description;
 };
 
-const linkButton = (label: string, url: string): MessageButtonOptions => {
+const linkButton = (
+  label: string,
+  url: string
+): MessageActionRowComponentResolvable => {
   return {
     type: 2,
     label: label,
@@ -124,30 +129,34 @@ const sendReport = async (report: ReportFragment, update?: SavedReport) => {
     naughty?.media
   );
 
-  const contentLink = (): MessageButtonOptions[] => {
+  const contentLink = (): MessageActionRowComponentResolvable[] => {
     return [
       linkButton(
         report?.naughty?.__typename ?? 'Reported Content',
         `https://kitsu.io/${naughty?.reason}/${naughty?.id}`
       ),
-      report.naughty.__typename === 'Comment'
+      report?.naughty?.__typename === 'Comment'
         ? linkButton('⟶ Post', `https://kitsu.io/posts/${naughty?.source}`)
-        : (undefined as unknown as MessageButtonOptions),
+        : (undefined as unknown as MessageActionRowComponentResolvable),
     ];
   };
 
   const links =
-    `[${report.naughty.author.name}](https://kitsu.io/users/${report.naughty.author.id})\n` +
+    `[${report?.naughty?.author.name}](https://kitsu.io/users/${report?.naughty?.author.id})\n` +
     contentLink() +
     `[Open Reports](https://kitsu.io/admin/reports/open)`;
 
   const fields: Discord.EmbedFieldData[] = [
-    { name: 'Reason', value: report.reason.toLowerCase(), inline: true },
-    { name: 'User ID', value: report.naughty.author.id, inline: true },
+    { name: 'Reason', value: report?.reason?.toLowerCase(), inline: true },
+    {
+      name: 'User ID',
+      value: report?.naughty?.author.id ?? 'missing id',
+      inline: true,
+    },
   ];
 
   const linkSource = () => {
-    if (report.naughty.__typename === 'Comment')
+    if (report?.naughty?.__typename === 'Comment')
       return [
         linkButton(
           report?.naughty?.__typename!,
@@ -167,11 +176,11 @@ const sendReport = async (report: ReportFragment, update?: SavedReport) => {
     linkButton('Open Reports', 'https://kitsu.io/admin/reports/open'),
   ];
 
-  const userRow: MessageButtonOptions[] = [
+  const userRow: MessageActionRowComponentResolvable[] = [
     linkButton('Reporter', `https://kitsu.io/users/${report.reporter.id}`),
     linkButton(
-      report.naughty.author.name,
-      `https://kitsu.io/users/${report.naughty.author.id}`
+      report?.naughty?.author.name ?? 'Naughty User',
+      `https://kitsu.io/users/${report?.naughty?.author.id}`
     ),
   ];
 
@@ -183,9 +192,9 @@ const sendReport = async (report: ReportFragment, update?: SavedReport) => {
 
   const embed = {
     author: {
-      name: report.naughty.author.name,
-      icon_url: avatar(report.naughty.author.avatarImage?.original.url),
-      url: 'https://kitsu.io/users/' + report.naughty.author.id,
+      name: report?.naughty?.author.name,
+      icon_url: avatar(report?.naughty?.author.avatarImage?.original.url),
+      url: 'https://kitsu.io/users/' + report?.naughty?.author.id,
     },
     description: description,
     footer: {
@@ -194,7 +203,7 @@ const sendReport = async (report: ReportFragment, update?: SavedReport) => {
     },
     timestamp: report.createdAt,
     fields: fields,
-    title: report.naughty.__typename,
+    title: report?.naughty?.__typename,
     color: 15097922,
   };
 
@@ -205,8 +214,8 @@ const sendReport = async (report: ReportFragment, update?: SavedReport) => {
     : 'No explanation';
 
   const componentRow = (
-    buttons: MessageButtonOptions[]
-  ): MessageActionRowOptions => {
+    buttons: MessageActionRowComponentResolvable[]
+  ): Required<BaseMessageComponentOptions> & MessageActionRowOptions => {
     return {
       type: 1,
       components: buttons,
@@ -290,15 +299,17 @@ export const editReport = async (
 
   const embed = new MessageEmbed(recievedEmbed).setFooter({
     text: `${moderator?.name} • ${data.status}`,
-    iconURL: modPfp
+    iconURL: modPfp,
   });
+
+  console.log(embed);
 
   const res = await webhookClient.editMessage(data.discordId, {
     content: message?.content,
     embeds: [embed],
   });
 
-  console.log(res)
+  console.log(res);
 
   if (res.content) {
     simpleUpdateReportStore({
