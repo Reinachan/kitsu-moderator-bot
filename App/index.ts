@@ -219,55 +219,33 @@ const reportsFunction = async () => {
   }
   if (data) {
     const nodes = data.reports?.nodes as ReportFragment[];
-    reportsSendHandler(nodes, false);
+    reportsSendHandler(nodes);
   }
 };
 
-const reportsPartial = async () => {
-  const { data, error, partial } = await fetchReports(FetchData.Partial);
-
-  console.log('Fetched Partial Reports');
-
-  if (error && partial) {
-    webhookLog('Reports Partial Error', error.message);
-  }
-  if (error && !partial) {
-    webhookLog('Reports Error', error.message);
-  }
-  if (data) {
-    const nodes = data.reports?.nodes as ReportPartialFragment[];
-    reportsSendHandler(nodes, true);
-  }
-};
-
-const reportsSendHandler = (
-  nodes: ReportFragment[] | ReportPartialFragment[] | null | undefined,
-  update?: boolean
+const reportsSendHandler = async (
+  nodes: ReportFragment[] | null | undefined
 ) => {
   if (nodes) {
     const reports = [...nodes]?.reverse();
 
-    for (let i = 0; i < reports.length; i++) {
-      const timeout = 1000 + i * 2000;
+    for (const report of reports) {
+      if (report) {
+        const existing = checkExists(report.id);
 
-      if (reports[i]) {
-        const existing = checkExists(reports[i].id);
-
-        setTimeout(async () => {
-          if (existing && existing?.status !== reports[i]?.status) {
-            await editReport(
-              {
-                id: reports[i].id,
-                discordId: existing.discordId,
-                status: reports[i].status,
-              },
-              reports[i].moderator
-            );
-          }
-          if (!existing) {
-            await sendReport(reports[i] as ReportFragment);
-          }
-        }, timeout);
+        if (existing && existing?.status !== report.status) {
+          await editReport(
+            {
+              id: report.id,
+              discordId: existing.discordId,
+              status: report.status,
+            },
+            report.moderator
+          );
+        }
+        if (!existing) {
+          await sendReport(report);
+        }
       }
     }
   }
@@ -281,20 +259,16 @@ const main = () => {
       try {
         reportsFunction();
         setInterval(() => reportsFunction(), 60000);
-        // setTimeout(() => {
-        //   reportsPartial();
-        //   setInterval(() => reportsPartial(), 60000);
-        // }, 30000);
       } catch {
         throw 'Failed somewhere within the reports part';
       }
 
-      // try {
-      //   unbanFunction();
-      //   setInterval(() => unbanFunction(), 1800000);
-      // } catch {
-      //   webhookLog('Crashed', 'Failed somewhere within the unbanning part');
-      // }
+      try {
+        unbanFunction();
+        setInterval(() => unbanFunction(), 1800000);
+      } catch {
+        webhookLog('Crashed', 'Failed somewhere within the unbanning part');
+      }
     } catch (e) {
       webhookLog('Crashed', 'Total collapse');
     }
