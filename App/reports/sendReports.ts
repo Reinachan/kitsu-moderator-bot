@@ -156,20 +156,25 @@ const sendReport = async (report: ReportFragment, update?: SavedReport) => {
   ];
 
   const linkSource = () => {
-    if (report?.naughty?.__typename === 'Comment')
+    if (report?.naughty?.__typename === 'Comment') {
       return [
         linkButton(
-          report?.naughty?.__typename!,
+          report.naughty.__typename,
           `https://kitsu.io/${naughty?.reason}/${naughty?.id}`
         ),
         linkButton('on Post', `https://kitsu.io/posts/${naughty?.source}`),
       ];
-    return [
-      linkButton(
-        report?.naughty?.__typename!,
-        `https://kitsu.io/${naughty?.reason}/${naughty?.id}`
-      ),
-    ];
+    }
+    if (report?.naughty?.__typename) {
+      return [
+        linkButton(
+          report?.naughty?.__typename ?? '',
+          `https://kitsu.io/${naughty?.reason}/${naughty?.id}`
+        ),
+      ];
+    } else {
+      return [linkButton('unknown', 'https://kitsu.io/')];
+    }
   };
 
   const openReports = [
@@ -305,7 +310,6 @@ export const editReport = async (
   console.log(embed);
 
   const res = await webhookClient.editMessage(data.discordId, {
-    content: message?.content,
     embeds: [embed],
   });
 

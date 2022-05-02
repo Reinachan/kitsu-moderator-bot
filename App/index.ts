@@ -149,7 +149,11 @@ const webhookEnvironment = (commandName: string, hook: StoredChannel) => {
       process.env.LOGGING_ID = hook?.webhookId;
       process.env.LOGGING_CHANNEL_ID = hook?.channelId;
       process.env.LOGGING_TOKEN = hook?.webhookToken;
-      console.log(process.env.LOGGING_ID, process.env.LOGGING_CHANNEL_ID, process.env.LOGGING_TOKEN)
+      console.log(
+        process.env.LOGGING_ID,
+        process.env.LOGGING_CHANNEL_ID,
+        process.env.LOGGING_TOKEN
+      );
       break;
     case 'reports':
       console.log('reports');
@@ -250,7 +254,7 @@ const reportsSendHandler = (
         const existing = checkExists(reports[i].id);
 
         setTimeout(async () => {
-          if (existing && update && existing?.status !== reports[i]?.status) {
+          if (existing && existing?.status !== reports[i]?.status) {
             await editReport(
               {
                 id: reports[i].id,
@@ -258,9 +262,9 @@ const reportsSendHandler = (
                 status: reports[i].status,
               },
               reports[i].moderator
-            ); 
+            );
           }
-          if (!existing && !update) {
+          if (!existing) {
             await sendReport(reports[i] as ReportFragment);
           }
         }, timeout);
@@ -277,20 +281,20 @@ const main = () => {
       try {
         reportsFunction();
         setInterval(() => reportsFunction(), 60000);
-        setTimeout(() => {
-          reportsPartial();
-          setInterval(() => reportsPartial(), 60000);
-        }, 30000);
+        // setTimeout(() => {
+        //   reportsPartial();
+        //   setInterval(() => reportsPartial(), 60000);
+        // }, 30000);
       } catch {
         throw 'Failed somewhere within the reports part';
       }
 
-      try {
-        unbanFunction();
-        setInterval(() => unbanFunction(), 1800000);
-      } catch {
-        webhookLog('Crashed', 'Failed somewhere within the unbanning part');
-      }
+      // try {
+      //   unbanFunction();
+      //   setInterval(() => unbanFunction(), 1800000);
+      // } catch {
+      //   webhookLog('Crashed', 'Failed somewhere within the unbanning part');
+      // }
     } catch (e) {
       webhookLog('Crashed', 'Total collapse');
     }
