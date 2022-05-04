@@ -7,7 +7,6 @@ cd $SCRIPT_DIR
 
 git pull
 npm install
-npm start
 
 n=0
 until [ "$n" -ge 5 ]
