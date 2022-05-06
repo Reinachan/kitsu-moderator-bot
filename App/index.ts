@@ -142,7 +142,10 @@ const initWebhookEnvironment = (hookName: string) => {
   if (hook) webhookEnvironment(hookName, hook);
 };
 
-const webhookEnvironment = (commandName: string, hook: StoredChannel) => {
+const webhookEnvironment = (
+  commandName: string,
+  hook: StoredChannel | void
+) => {
   switch (commandName) {
     case 'logging':
       console.log('logging');

@@ -59,9 +59,9 @@ const naughtyContent = (
   }
 };
 
-const mkdLink = (displayed: string, link: string) => {
-  return `[${displayed}](${link})`;
-};
+// const mkdLink = (displayed: string, link: string) => {
+//   return `[${displayed}](${link})`;
+// };
 
 const isSpoiler = (report: ReportFragment) => {
   if (report.reason === 'SPOILER') {
@@ -110,7 +110,7 @@ const generateDescription = (
   return truncate(content);
 };
 
-const sendReport = async (report: ReportFragment, update?: SavedReport) => {
+const sendReport = async (report: ReportFragment) => {
   const reportsId = process.env.REPORTS_ID || '';
   const reportsToken = process.env.REPORTS_TOKEN || '';
 
@@ -129,22 +129,22 @@ const sendReport = async (report: ReportFragment, update?: SavedReport) => {
     naughty?.media
   );
 
-  const contentLink = (): MessageActionRowComponentResolvable[] => {
-    return [
-      linkButton(
-        report?.naughty?.__typename ?? 'Reported Content',
-        `https://kitsu.io/${naughty?.reason}/${naughty?.id}`
-      ),
-      report?.naughty?.__typename === 'Comment'
-        ? linkButton('⟶ Post', `https://kitsu.io/posts/${naughty?.source}`)
-        : (undefined as unknown as MessageActionRowComponentResolvable),
-    ];
-  };
+  // const contentLink = (): MessageActionRowComponentResolvable[] => {
+  //   return [
+  //     linkButton(
+  //       report?.naughty?.__typename ?? 'Reported Content',
+  //       `https://kitsu.io/${naughty?.reason}/${naughty?.id}`
+  //     ),
+  //     report?.naughty?.__typename === 'Comment'
+  //       ? linkButton('⟶ Post', `https://kitsu.io/posts/${naughty?.source}`)
+  //       : (undefined as unknown as MessageActionRowComponentResolvable),
+  //   ];
+  // };
 
-  const links =
-    `[${report?.naughty?.author.name}](https://kitsu.io/users/${report?.naughty?.author.id})\n` +
-    contentLink() +
-    `[Open Reports](https://kitsu.io/admin/reports/open)`;
+  // const links =
+  //   `[${report?.naughty?.author.name}](https://kitsu.io/users/${report?.naughty?.author.id})\n` +
+  //   contentLink() +
+  //   `[Open Reports](https://kitsu.io/admin/reports/open)`;
 
   const fields: Discord.EmbedFieldData[] = [
     { name: 'Reason', value: report?.reason?.toLowerCase(), inline: true },
@@ -227,49 +227,21 @@ const sendReport = async (report: ReportFragment, update?: SavedReport) => {
     };
   };
 
-  if (update) {
-    await axios({
-      url: `https://discord.com/api/webhooks/${reportsId}/${reportsToken}/messages/${update?.discordId}`,
-      headers: {
-        wait: 'false',
-      },
-      method: 'patch',
-      data: {
-        content: messageContent,
-        username: report.reporter.name,
-        avatar_url: avatar(report.reporter.avatarImage?.original.url),
-        embeds: [embed],
-        components: [
-          componentRow(userRow),
-          componentRow(linkSource()),
-          componentRow(openReports),
-        ],
-      },
-      responseType: 'json',
-    });
+  const response = await webhookClient.send({
+    content: messageContent,
+    username: report.reporter.name,
+    avatarURL: avatar(report.reporter.avatarImage?.original.url),
+    embeds: [embed],
+    components: [
+      componentRow(userRow.concat(linkSource().concat(openReports))),
+    ],
+  });
 
-    simpleUpdateReportStore({
-      id: report.id,
-      discordId: update.discordId,
-      status: report.status,
-    });
-  } else {
-    const response = await webhookClient.send({
-      content: messageContent,
-      username: report.reporter.name,
-      avatarURL: avatar(report.reporter.avatarImage?.original.url),
-      embeds: [embed],
-      components: [
-        componentRow(userRow.concat(linkSource().concat(openReports))),
-      ],
-    });
-
-    simpleReportsStore({
-      id: report.id,
-      discordId: response.id,
-      status: report.status,
-    });
-  }
+  simpleReportsStore({
+    id: report.id,
+    discordId: response.id,
+    status: report.status,
+  });
 };
 
 export const editReport = async (

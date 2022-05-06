@@ -7,10 +7,4 @@ cd $SCRIPT_DIR
 
 git pull
 npm install
-
-n=0
-until [ "$n" -ge 5 ]
-do
-  npm start
-  sleep 20
-done
+npm start
