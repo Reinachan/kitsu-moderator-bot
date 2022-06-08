@@ -2,15 +2,13 @@ import Discord, {
   BaseMessageComponentOptions,
   MessageActionRowComponentResolvable,
   MessageActionRowOptions,
-  MessageButtonOptions,
   MessageEmbed,
   TextChannel,
 } from 'discord.js';
-import { Profile, ReportFragment } from '../gen/kitsu';
+import { ReportFragment } from '../gen/kitsu';
 import simpleReportsStore, {
   simpleUpdateReportStore,
 } from '../util/ReportsStorage';
-import axios from 'axios';
 import { client } from '../index';
 
 interface NaughtyContent {

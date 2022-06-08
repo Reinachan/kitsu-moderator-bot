@@ -109,9 +109,7 @@ client.on('interactionCreate', async (interaction) => {
       channel as TextChannel
     );
 
-    console.log(hook?.name, 'HERE');
-
-    webhookEnvironment(commandName, hook);
+    if (hook) webhookEnvironment(commandName, hook);
 
     await interaction.reply({
       content: `${commandName} is set to <#${channel.id}>`,
@@ -142,10 +140,7 @@ const initWebhookEnvironment = (hookName: string) => {
   if (hook) webhookEnvironment(hookName, hook);
 };
 
-const webhookEnvironment = (
-  commandName: string,
-  hook: StoredChannel | void
-) => {
+const webhookEnvironment = (commandName: string, hook: StoredChannel) => {
   switch (commandName) {
     case 'logging':
       console.log('logging');
