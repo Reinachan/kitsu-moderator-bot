@@ -3,3 +3,4 @@
 /.env
 **/reports.json
 /log
+kitsu-moderator-bot.service
