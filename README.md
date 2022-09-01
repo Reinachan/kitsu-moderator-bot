@@ -1,14 +1,69 @@
-# Kitsu Unban
-Unbans users on a specified date and time using a Google Sheet
+# Kitsu Moderator Bot
+
+Unbans users on a specified date and time using a Google Sheet as well as sending reports to a Discord channel.
 
 Fetches every 30 minutes.
 
+## Setup
+
+Add the `./kitsu-moderator-bot.service` file as a systemd service like this
+
+Modify the "exec" field in `./kitsu-moderator-bot.service` to be the absolute path to the `./start.sh` script in this folder.
+
+Restrict read/write access so only you can read/write and the group can only read by running
+
+```bash
+sudo chmod 640 ./kitsu-moderator-bot.service
+```
+
+From this directory, run
+
+```bash
+sudo mv ./kitsu-moderator-bot.service /etc/systemd/system
+```
+
+Reload the daemon for the upcoming systemctl commands to work with this command
+
+```bash
+sudo systemctl daemon-reload
+```
+
+To enable the service to start when the computer starts, run
+
+```bash
+sudo systemctl enable kitsu-moderator-bot
+```
+
+To start the service run
+
+```bash
+sudo systemctl start kitsu-moderator-bot
+```
+
+To verify it's working correctly, run
+
+```bash
+sudo systemctl status kitsu-moderator-bot
+```
+
+To stop the service run
+
+```bash
+sudo systemctl stop kitsu-moderator-bot
+```
+
+To disable the service run
+
+```bash
+sudo systemctl disable kitsu-moderator-bot
+```
+
 ## Sheet format
 
-|**Done**|**Displayname**|**User ID**\*|**Date**\*|**Time** (24h, UTC+2)|**Moderator**|**Reason**|
-|:-----:|:-----|-----:|-----:|-----:|:-----|:-----|
-|&#9745;|Reina|00000|2021-07-13|12:00| Reina | Was too cool for school|
-|&#9744;|Something|00000|2021-07-14|22:00| Reina | Maybe also too cool for school|
+| **Done** | **Displayname** | **User ID**\* | **Date**\* | **Time** (24h, UTC+2) | **Moderator** | **Reason**                     |
+| :------: | :-------------- | ------------: | ---------: | --------------------: | :------------ | :----------------------------- |
+| &#9745;  | Reina           |         00000 | 2021-07-13 |                 12:00 | Reina         | Was too cool for school        |
+| &#9744;  | Something       |         00000 | 2021-07-14 |                 22:00 | Reina         | Maybe also too cool for school |
 
 \*Required fields
 

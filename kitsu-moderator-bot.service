@@ -1,0 +1,15 @@
+[Unit]
+Description=Kitsu Moderator Bot
+
+Wants=network.target
+After=syslog.target network-online.target
+
+[Service]
+Type=simple
+ExecStart=~/Documents/GitHub/kitsu-moderator-bot/start.sh
+Restart=on-failure
+RestartSec=60
+KillMode=mixed
+
+[Install]
+WantedBy=multi-user.target
