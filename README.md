@@ -6,38 +6,10 @@ Fetches every 30 minutes.
 
 ## Setup
 
-Add the `./kitsu-moderator-bot.service` file as a systemd service like this
-
-Modify the "exec" field in `./kitsu-moderator-bot.service` to be the absolute path to the `./start.sh` script in this folder.
-
-Restrict read/write access so only you can read/write and the group can only read by running
+Create a file `kitsu-moderator-bot.service` based on the `kitsu-moderator-bot.service.example` file where you replace `<username>` with your username and make other path changes if necessary. The example file assumes you're using nvm as your node version manager and that you have Node version 16 installed. Then run
 
 ```bash
-sudo chmod 640 ./kitsu-moderator-bot.service
-```
-
-From this directory, run
-
-```bash
-sudo cp ./kitsu-moderator-bot.service /etc/systemd/system
-```
-
-Reload the daemon for the upcoming systemctl commands to work with this command
-
-```bash
-sudo systemctl daemon-reload
-```
-
-To enable the service to start when the computer starts, run
-
-```bash
-sudo systemctl enable kitsu-moderator-bot
-```
-
-To start the service run
-
-```bash
-sudo systemctl start kitsu-moderator-bot
+sudo ./configure-service.sh
 ```
 
 To verify it's working correctly, run

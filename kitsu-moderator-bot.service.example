@@ -1,15 +1,18 @@
 [Unit]
 Description=Kitsu Moderator Bot
 
-Wants=network.target
-After=syslog.target network-online.target
+After=network.target
 
 [Service]
+Environment=NODE_VERSION=16
+WorkingDirectory=/home/<username>/Documents/GitHub/kitsu-moderator-bot
 Type=simple
-ExecStart=~/Documents/GitHub/kitsu-moderator-bot/start.sh
+ExecStartPre=/usr/bin/git pull
+ExecStartPre=/home/<username>/.config/nvm/nvm-exec npm install 
+ExecStart=/home/<username>/.config/nvm/nvm-exec npm start
 Restart=on-failure
 RestartSec=60
-KillMode=mixed
+KillMode=process
 
 [Install]
 WantedBy=multi-user.target
