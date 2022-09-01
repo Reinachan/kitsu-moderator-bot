@@ -1,1 +1,0 @@
-ts-node -T App/index.ts

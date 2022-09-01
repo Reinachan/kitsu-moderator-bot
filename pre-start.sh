@@ -5,4 +5,5 @@ echo $SCRIPT_DIR
 
 cd $SCRIPT_DIR
 
-npm start
+git pull
+npm install
