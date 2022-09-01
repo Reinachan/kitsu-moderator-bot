@@ -19,7 +19,7 @@ sudo chmod 640 ./kitsu-moderator-bot.service
 From this directory, run
 
 ```bash
-sudo mv ./kitsu-moderator-bot.service /etc/systemd/system
+sudo cp ./kitsu-moderator-bot.service /etc/systemd/system
 ```
 
 Reload the daemon for the upcoming systemctl commands to work with this command
