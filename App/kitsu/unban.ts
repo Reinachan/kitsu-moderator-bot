@@ -4,7 +4,7 @@ import { setServerSideProps } from '../google/setProps';
 import webhookLog from '../webhookLog';
 import notify from './notify';
 
-const unbanMessage = (data: UnbanData) => {
+const unbanMessage = (data: UnbanData, customTitle?: string) => {
   const logLink = `https://discord.com/api/webhooks/${process.env.UNBAN_ID}/${process.env.UNBAN_TOKEN}`;
 
   const boolSign = (bool: string) => {
@@ -26,7 +26,7 @@ const unbanMessage = (data: UnbanData) => {
         'https://cdn.discordapp.com/icons/459452478673649665/4f6c3b9f6a3aab24c5333261cc519ba6.webp?size=256',
       embeds: [
         {
-          title: `Unbanned ${data?.dName}`,
+          title: customTitle ?? `Unbanned ${data?.dName}`,
           // url: `https://kitsu.io/users/${data.uId}`,
           timestamp: data?.unban,
           description: `[Open profile](https://kitsu.io/users/${data?.uId})`,
@@ -35,7 +35,7 @@ const unbanMessage = (data: UnbanData) => {
             {
               name: 'Status',
               value:
-                `Unbanned: ${boolSign('TRUE')}\n` +
+                `Unbanned: ${boolSign(data?.completed)}\n` +
                 `Notified: ${boolSign(data?.notify)}`,
               inline: true,
             },
@@ -65,18 +65,31 @@ const unban = async (data: UnbanData) => {
   });
 
   try {
+    if (unbanned.status === 404) {
+      setServerSideProps(id);
+
+      unbanMessage(
+        {
+          ...data,
+          completed: 'FALSE',
+        },
+        `${data.dName} — Not Found`
+      );
+
+      return;
+    }
+
     const res = JSON.parse(await unbanned?.text());
     console.log(res?.banned);
 
-    if (res.banned === false) {
+    if (res?.banned === false) {
       console.log('unbanned');
 
-      if (data?.notify === 'TRUE') {
-        notify(data);
-      }
+      if (data?.notify === 'TRUE') notify(data);
+
       setServerSideProps(id);
 
-      unbanMessage(data);
+      unbanMessage({ ...data, completed: 'TRUE' });
     }
   } catch {
     webhookLog('Partially Down', 'Failed to unban in some way');
