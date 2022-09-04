@@ -17,9 +17,10 @@ import { getServerSideProps } from './google/getProps';
 import unban from './kitsu/unban';
 import fetchReports, { FetchData } from './reports/fetchReports';
 import sendReport, { editReport } from './reports/sendReports';
-import checkDate from './util/checkDate';
-import { checkExists } from './util/ReportsStorage';
+import checkDate from './helpers/checkDate';
+import { checkExists } from './helpers/ReportsStorage';
 import webhookLog from './webhookLog';
+import sleep from './helpers/sleep';
 
 require('dotenv').config();
 
@@ -189,16 +190,18 @@ const unbanFunction = async () => {
       cont = false;
     } else if (list.completed === 'TRUE') {
       console.log('already completed');
+
       i++;
     } else {
       console.log(list);
 
       if (checkDate(list.unban, list.time) && list.completed === 'FALSE') {
-        unban(list);
+        await unban(list);
       }
 
       i++;
     }
+    await sleep(2000);
   }
 };
 

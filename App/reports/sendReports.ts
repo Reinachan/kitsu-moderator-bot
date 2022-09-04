@@ -8,7 +8,7 @@ import Discord, {
 import { ReportFragment } from '../gen/kitsu';
 import simpleReportsStore, {
   simpleUpdateReportStore,
-} from '../util/ReportsStorage';
+} from '../helpers/ReportsStorage';
 import { client } from '../index';
 
 interface NaughtyContent {
