@@ -9,6 +9,4 @@ RUN npm install --production --silent && mv node_modules ../
 
 COPY . .
 
-RUN chmod +x ./start.sh
-
-CMD ["./start.sh"]
+CMD ["npm", "start"]
